@@ -1,0 +1,150 @@
+body {
+  font-family: Arial, sans-serif;
+  width: 320px;
+  margin: 0;
+  padding: 10px;
+  color: #333;
+}
+
+.container {
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+}
+
+h1 {
+  font-size: 18px;
+  margin: 0;
+  color: #2e7d32;
+  text-align: center;
+  padding-bottom: 10px;
+  border-bottom: 1px solid #e0e0e0;
+}
+
+h2 {
+  font-size: 14px;
+  margin: 5px 0;
+}
+
+.status-container {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.status-on {
+  color: #2e7d32;
+  font-weight: bold;
+}
+
+.status-off {
+  color: #c62828;
+  font-weight: bold;
+}
+
+/* Switch toggle styling */
+.switch {
+  position: relative;
+  display: inline-block;
+  width: 50px;
+  height: 24px;
+  margin-left: auto;
+}
+
+.switch input {
+  opacity: 0;
+  width: 0;
+  height: 0;
+}
+
+.slider {
+  position: absolute;
+  cursor: pointer;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: #ccc;
+  transition: .4s;
+}
+
+.slider:before {
+  position: absolute;
+  content: "";
+  height: 16px;
+  width: 16px;
+  left: 4px;
+  bottom: 4px;
+  background-color: white;
+  transition: .4s;
+}
+
+input:checked + .slider {
+  background-color: #2e7d32;
+}
+
+input:focus + .slider {
+  box-shadow: 0 0 1px #2e7d32;
+}
+
+input:checked + .slider:before {
+  transform: translateX(26px);
+}
+
+.slider.round {
+  border-radius: 24px;
+}
+
+.slider.round:before {
+  border-radius: 50%;
+}
+
+textarea {
+  width: 100%;
+  resize: vertical;
+  padding: 8px;
+  font-size: 12px;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+}
+
+.btn-container {
+  display: flex;
+  gap: 10px;
+  margin-top: 10px;
+}
+
+button {
+  background-color: #2e7d32;
+  color: white;
+  border: none;
+  padding: 8px 12px;
+  border-radius: 4px;
+  cursor: pointer;
+  flex: 1;
+  font-size: 12px;
+}
+
+button:hover {
+  background-color: #1b5e20;
+}
+
+#resetBtn {
+  background-color: #757575;
+}
+
+#resetBtn:hover {
+  background-color: #616161;
+}
+
+.info {
+  font-size: 12px;
+  background-color: #e8f5e9;
+  padding: 10px;
+  border-radius: 4px;
+  border-left: 4px solid #2e7d32;
+}
+
+.info p {
+  margin: 5px 0;
+}

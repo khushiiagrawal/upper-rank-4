@@ -1,12 +1,36 @@
 <!DOCTYPE html>
 <html>
 <head>
-  <title>R3Vision</title>
-  <link rel="stylesheet" href="styles.css" />
+  <title>Eco-Friendly Product Filter</title>
+  <link rel="stylesheet" href="popup.css">
 </head>
 <body>
-  <h2>R3Vision</h2>
-  <button id="filterBtn">Filter Eco-Friendly</button>
+  <div class="container">
+    <h1>Eco-Friendly Product Filter</h1>
+    
+    <div class="status-container">
+      <span>Status:</span>
+      <span id="status" class="status-off">OFF</span>
+      <label class="switch">
+        <input type="checkbox" id="toggleSwitch">
+        <span class="slider round"></span>
+      </label>
+    </div>
+    
+    <div class="options">
+      <h2>Keywords to identify eco-friendly products:</h2>
+      <textarea id="keywords" rows="8" cols="40"></textarea>
+      <div class="btn-container">
+        <button id="saveBtn">Save Keywords</button>
+        <button id="resetBtn">Reset to Default</button>
+      </div>
+    </div>
+    
+    <div class="info">
+      <p>This extension filters e-commerce sites to show only eco-friendly products.</p>
+      <p>Toggle the switch to enable/disable filtering.</p>
+    </div>
+  </div>
   <script src="popup.js"></script>
 </body>
 </html>
