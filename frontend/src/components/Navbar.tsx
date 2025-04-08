@@ -52,11 +52,10 @@ const Navbar = () => {
       initial={{ y: -100 }}
       animate={{ y: 0 }}
       transition={{ duration: 0.5 }}
-      className={`fixed w-full z-50 transition-all duration-300 ${
-        scrolled ? "bg-white shadow-lg py-2" : "bg-transparent py-4"
-      }`}
+      className={`fixed w-full z-50 transition-all duration-300 
+         bg-green-50 shadow-lg `} // Adjusted to use shadow-lg for a more pronounced effect
     >
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div className="max-w-8xl mx-auto px-4 sm:px-6 lg:px-12">
         <div className="flex justify-between items-center">
           <Link href="/" className="flex items-center">
             <motion.div
@@ -64,8 +63,13 @@ const Navbar = () => {
               whileTap={{ scale: 0.95 }}
               className="flex items-center"
             >
-              <span className="text-2xl font-bold text-green-600">3R</span>
-              <span className="text-2xl font-bold text-gray-800">Vision</span>
+              <Link href="/">
+              <img
+                src="/logo.png"
+                alt="Logo"
+                className="h-20 w-auto" // Adjusted height for the logo
+              />
+              </Link>
             </motion.div>
           </Link>
 
@@ -75,13 +79,13 @@ const Navbar = () => {
               <Link
                 key={link.name}
                 href={link.href}
-                className={`flex items-center gap-1 text-sm font-medium transition-colors ${
-                  pathname === link.href
-                    ? "text-green-600"
-                    : "text-gray-700 hover:text-green-600"
-                }`}
+                className={`flex items-center gap-1 text-xl font-medium transition-colors 
+                  
+                     text-green-700
+                    
+                `}
               >
-                <span className="text-xs">{link.icon}</span>
+                <span className="text-base">{link.icon}</span> {/* Adjusted icon size */}
                 {link.name}
               </Link>
             ))}
@@ -117,11 +121,10 @@ const Navbar = () => {
               key={link.name}
               href={link.href}
               onClick={() => setIsOpen(false)}
-              className={`flex items-center gap-2 px-3 py-2 rounded-md text-base font-medium ${
-                pathname === link.href
-                  ? "bg-green-100 text-green-600"
-                  : "text-gray-700 hover:bg-gray-100 hover:text-green-600"
-              }`}
+              className={`flex items-center gap-2 px-3 py-2 rounded-md text-lg font-medium 
+              hover:bg-green-200 transition-colors 
+                  
+              `}
             >
               <span>{link.icon}</span>
               {link.name}
