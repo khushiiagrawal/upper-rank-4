@@ -2,6 +2,7 @@ import Navbar from "../components/Navbar";
 import HeroSection from "../components/HeroSection";
 import AboutSection from "../components/AboutSection";
 import HowToUseSection from "../components/HowToUseSection";
+import CommunitySection from "../components/CommunitySection";
 import ContactSection from "../components/ContactSection";
 import Footer from "../components/Footer";
 
@@ -28,6 +29,7 @@ export default function Home() {
       <HeroSection />
       <AboutSection />
       <HowToUseSection />
+      <CommunitySection />
       <ContactSection />
       <Footer />
     </main>
