@@ -1,116 +1,135 @@
 "use client";
 
+import { useState, useEffect } from "react";
 import Link from "next/link";
+import { usePathname } from "next/navigation";
 import { motion } from "framer-motion";
-import { useState } from "react";
-import { FaBars, FaTimes } from "react-icons/fa";
+import {
+  FaBars,
+  FaTimes,
+  FaHome,
+  FaUsers,
+  FaInfoCircle,
+  FaQuestionCircle,
+  FaEnvelope,
+} from "react-icons/fa";
 
 const Navbar = () => {
-  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const [isOpen, setIsOpen] = useState(false);
+  const [scrolled, setScrolled] = useState(false);
+  const pathname = usePathname();
+  const isCommunityPage = pathname === "/community";
 
-  const scrollToSection = (sectionId: string) => {
-    const element = document.getElementById(sectionId);
-    if (element) {
-      element.scrollIntoView({ behavior: "smooth" });
-      setMobileMenuOpen(false); // Close mobile menu after clicking
-    }
-  };
+  useEffect(() => {
+    const handleScroll = () => {
+      if (window.scrollY > 10) {
+        setScrolled(true);
+      } else {
+        setScrolled(false);
+      }
+    };
 
-  const navItems = [
-    { name: "Home", id: "hero" },
-    { name: "About Us", id: "about" },
-    { name: "How to Use", id: "how-to-use" },
-    { name: "Community", id: "community" },
-    { name: "Contact Us", id: "contact" },
-  ];
+    window.addEventListener("scroll", handleScroll);
+    return () => window.removeEventListener("scroll", handleScroll);
+  }, []);
+
+  const navLinks = isCommunityPage
+    ? [{ name: "Home", href: "/", icon: <FaHome /> }]
+    : [
+        { name: "Home", href: "/", icon: <FaHome /> },
+        { name: "About", href: "/#about", icon: <FaInfoCircle /> },
+        {
+          name: "How to Use",
+          href: "/#how-to-use",
+          icon: <FaQuestionCircle />,
+        },
+        { name: "Community", href: "/community", icon: <FaUsers /> },
+        { name: "Contact", href: "/#contact", icon: <FaEnvelope /> },
+      ];
 
   return (
-    <nav className="fixed w-full z-50">
+    <motion.nav
+      initial={{ y: -100 }}
+      animate={{ y: 0 }}
+      transition={{ duration: 0.5 }}
+      className={`fixed w-full z-50 transition-all duration-300 ${
+        scrolled ? "bg-white shadow-lg py-2" : "bg-transparent py-4"
+      }`}
+    >
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="flex items-center justify-between h-16">
-          <motion.div
-            initial={{ opacity: 0, x: -20 }}
-            animate={{ opacity: 1, x: 0 }}
-            transition={{ duration: 0.5 }}
-            className="flex-shrink-0"
-          >
-            <Link
-              href="/"
-              className="text-2xl font-bold text-green-600 hover:text-green-500 transition-colors duration-300"
+        <div className="flex justify-between items-center">
+          <Link href="/" className="flex items-center">
+            <motion.div
+              whileHover={{ scale: 1.05 }}
+              whileTap={{ scale: 0.95 }}
+              className="flex items-center"
             >
-              3RVision
-            </Link>
-          </motion.div>
+              <span className="text-2xl font-bold text-green-600">3R</span>
+              <span className="text-2xl font-bold text-gray-800">Vision</span>
+            </motion.div>
+          </Link>
 
           {/* Desktop Navigation */}
-          <div className="hidden md:block">
-            <div className="ml-10 flex items-baseline space-x-8">
-              {navItems.map((item, index) => (
-                <motion.div
-                  key={item.name}
-                  initial={{ opacity: 0, y: -20 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  transition={{ duration: 0.5, delay: index * 0.1 }}
-                >
-                  <motion.button
-                    onClick={() => scrollToSection(item.id)}
-                    className="relative px-4 py-2 text-green-300 font-medium overflow-hidden rounded-md transition-all duration-300 group"
-                    whileHover={{ scale: 1.05 }}
-                    whileTap={{ scale: 0.95 }}
-                  >
-                    <span className="relative z-10">{item.name}</span>
-                    <span className="absolute inset-0 bg-gradient-to-r from-green-500/20 to-green-400/20 opacity-0 group-hover:opacity-100 transition-opacity duration-300"></span>
-                    <span className="absolute bottom-0 left-0 w-full h-0.5 bg-gradient-to-r from-green-400 to-green-300 transform scale-x-0 group-hover:scale-x-100 transition-transform duration-300 origin-left"></span>
-                  </motion.button>
-                </motion.div>
-              ))}
-            </div>
+          <div className="hidden md:flex items-center space-x-8">
+            {navLinks.map((link) => (
+              <Link
+                key={link.name}
+                href={link.href}
+                className={`flex items-center gap-1 text-sm font-medium transition-colors ${
+                  pathname === link.href
+                    ? "text-green-600"
+                    : "text-gray-700 hover:text-green-600"
+                }`}
+              >
+                <span className="text-xs">{link.icon}</span>
+                {link.name}
+              </Link>
+            ))}
           </div>
 
-          {/* Mobile menu button */}
+          {/* Mobile Navigation Button */}
           <div className="md:hidden">
-            <motion.button
-              onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-              className="text-green-300 hover:text-green-400 focus:outline-none"
-              whileHover={{ scale: 1.1 }}
-              whileTap={{ scale: 0.9 }}
+            <button
+              onClick={() => setIsOpen(!isOpen)}
+              className="text-gray-700 hover:text-green-600 focus:outline-none"
             >
-              {mobileMenuOpen ? (
-                <FaTimes className="h-6 w-6" />
-              ) : (
-                <FaBars className="h-6 w-6" />
-              )}
-            </motion.button>
+              {isOpen ? <FaTimes size={24} /> : <FaBars size={24} />}
+            </button>
           </div>
         </div>
       </div>
 
-      {/* Mobile menu */}
+      {/* Mobile Navigation Menu */}
       <motion.div
-        initial={false}
+        initial={{ opacity: 0, height: 0 }}
         animate={{
-          height: mobileMenuOpen ? "auto" : 0,
-          opacity: mobileMenuOpen ? 1 : 0,
+          opacity: isOpen ? 1 : 0,
+          height: isOpen ? "auto" : 0,
         }}
         transition={{ duration: 0.3 }}
-        className="md:hidden overflow-hidden bg-green-900/90 backdrop-blur-md"
+        className={`md:hidden overflow-hidden ${
+          scrolled ? "bg-white" : "bg-white/90 backdrop-blur-sm"
+        }`}
       >
-        <div className="px-2 pt-2 pb-3 space-y-1">
-          {navItems.map((item, index) => (
-            <motion.button
-              key={item.name}
-              onClick={() => scrollToSection(item.id)}
-              className="block w-full text-left px-3 py-2 text-green-300 hover:text-green-400 hover:bg-green-800/50 rounded-md text-base font-medium transition-colors duration-200"
-              initial={{ opacity: 0, x: -20 }}
-              animate={{ opacity: 1, x: 0 }}
-              transition={{ duration: 0.3, delay: index * 0.1 }}
+        <div className="px-4 pt-2 pb-3 space-y-1">
+          {navLinks.map((link) => (
+            <Link
+              key={link.name}
+              href={link.href}
+              onClick={() => setIsOpen(false)}
+              className={`flex items-center gap-2 px-3 py-2 rounded-md text-base font-medium ${
+                pathname === link.href
+                  ? "bg-green-100 text-green-600"
+                  : "text-gray-700 hover:bg-gray-100 hover:text-green-600"
+              }`}
             >
-              {item.name}
-            </motion.button>
+              <span>{link.icon}</span>
+              {link.name}
+            </Link>
           ))}
         </div>
       </motion.div>
-    </nav>
+    </motion.nav>
   );
 };
 

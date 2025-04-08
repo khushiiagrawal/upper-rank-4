@@ -2,8 +2,11 @@
 
 import { motion } from "framer-motion";
 import { FaUsers, FaLightbulb, FaHandshake, FaComments } from "react-icons/fa";
+import { useRouter } from "next/navigation";
 
 const CommunitySection = () => {
+  const router = useRouter();
+
   const features = [
     {
       icon: <FaUsers className="text-4xl text-green-400" />,
@@ -30,6 +33,10 @@ const CommunitySection = () => {
         "Engage in meaningful discussions about sustainability and waste reduction.",
     },
   ];
+
+  const handleJoinNow = () => {
+    router.push("/community");
+  };
 
   return (
     <section id="community" className="py-20 bg-white relative">
@@ -78,7 +85,10 @@ const CommunitySection = () => {
           transition={{ duration: 0.5, delay: 0.4 }}
           className="mt-16 text-center"
         >
-          <button className="px-8 py-3 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors duration-200 shadow-lg hover:shadow-xl transform hover:-translate-y-1">
+          <button
+            onClick={handleJoinNow}
+            className="px-8 py-3 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors duration-200 shadow-lg hover:shadow-xl transform hover:-translate-y-1"
+          >
             Join Now
           </button>
         </motion.div>

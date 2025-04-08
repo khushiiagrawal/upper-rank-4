@@ -52,7 +52,7 @@ const ContactSection = () => {
   ];
 
   return (
-    <section id="contact" className="py-20 bg-white relative overflow-hidden">
+    <section id="contact" className="py-12 bg-white relative overflow-hidden">
       {/* Animated background elements */}
       <div className="absolute inset-0 pointer-events-none">
         <div
