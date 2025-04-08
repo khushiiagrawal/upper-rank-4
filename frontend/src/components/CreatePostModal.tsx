@@ -2,23 +2,14 @@
 
 import { useState, useEffect } from "react";
 import { motion } from "framer-motion";
-import {
-  FaUpload,
-  FaTags,
-  FaEye,
-  FaEyeSlash,
-  FaImage,
-  FaPoll,
-  FaLink,
-  FaCode,
-} from "react-icons/fa";
+import { FaUpload, FaTags, FaImage, FaLink } from "react-icons/fa";
 import { IoMdClose } from "react-icons/io";
 import { MdPreview } from "react-icons/md";
 
 interface CreatePostModalProps {
   isOpen: boolean;
   onClose: () => void;
-  onSubmit: (formData: FormData) => Promise<void>;
+  onSubmit: (postData: any) => Promise<void>;
 }
 
 const CreatePostModal = ({
@@ -34,14 +25,16 @@ const CreatePostModal = ({
   const [platformUsage, setPlatformUsage] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [category, setCategory] = useState("general");
-  const [visibility, setVisibility] = useState("public");
   const [showPreview, setShowPreview] = useState(false);
   const [postType, setPostType] = useState("text");
-  const [pollOptions, setPollOptions] = useState(["", ""]);
   const [linkUrl, setLinkUrl] = useState("");
-  const [codeSnippet, setCodeSnippet] = useState("");
-  const [codeLanguage, setCodeLanguage] = useState("javascript");
   const [formErrors, setFormErrors] = useState<Record<string, string>>({});
+  const [mounted, setMounted] = useState(false);
+
+  // Set mounted state after component mounts to avoid hydration mismatch
+  useEffect(() => {
+    setMounted(true);
+  }, []);
 
   // Reset form when modal opens
   useEffect(() => {
@@ -53,12 +46,8 @@ const CreatePostModal = ({
       setTags("");
       setPlatformUsage("");
       setCategory("general");
-      setVisibility("public");
       setPostType("text");
-      setPollOptions(["", ""]);
       setLinkUrl("");
-      setCodeSnippet("");
-      setCodeLanguage("javascript");
       setFormErrors({});
     }
   }, [isOpen]);
@@ -91,25 +80,6 @@ const CreatePostModal = ({
     }
   };
 
-  const addPollOption = () => {
-    if (pollOptions.length < 10) {
-      setPollOptions([...pollOptions, ""]);
-    }
-  };
-
-  const updatePollOption = (index: number, value: string) => {
-    const newOptions = [...pollOptions];
-    newOptions[index] = value;
-    setPollOptions(newOptions);
-  };
-
-  const removePollOption = (index: number) => {
-    if (pollOptions.length > 2) {
-      const newOptions = pollOptions.filter((_, i) => i !== index);
-      setPollOptions(newOptions);
-    }
-  };
-
   const validateForm = () => {
     const errors: Record<string, string> = {};
 
@@ -121,29 +91,10 @@ const CreatePostModal = ({
       errors.description = "Description is required";
     }
 
-    if (postType === "poll") {
-      const emptyOptions = pollOptions.filter((option) => !option.trim());
-      if (emptyOptions.length > 0) {
-        errors.pollOptions = "All poll options must be filled";
-      }
-
-      // Check for duplicate options
-      const uniqueOptions = new Set(
-        pollOptions.map((option) => option.trim().toLowerCase())
-      );
-      if (uniqueOptions.size !== pollOptions.length) {
-        errors.pollOptions = "Poll options must be unique";
-      }
-    }
-
     if (postType === "link" && !linkUrl.trim()) {
       errors.linkUrl = "Link URL is required";
     } else if (postType === "link" && linkUrl.trim() && !isValidUrl(linkUrl)) {
       errors.linkUrl = "Please enter a valid URL";
-    }
-
-    if (postType === "code" && !codeSnippet.trim()) {
-      errors.codeSnippet = "Code snippet is required";
     }
 
     if (!platformUsage.trim()) {
@@ -173,32 +124,23 @@ const CreatePostModal = ({
     setIsSubmitting(true);
 
     try {
-      // Create FormData object
-      const formData = new FormData();
-      formData.append("title", title);
-      formData.append("description", description);
-      formData.append("tags", tags);
-      formData.append("platformUsage", platformUsage);
-      formData.append("category", category);
-      formData.append("visibility", visibility);
-      formData.append("postType", postType);
-
-      if (postType === "poll") {
-        formData.append("pollOptions", JSON.stringify(pollOptions));
-      } else if (postType === "link") {
-        formData.append("linkUrl", linkUrl);
-      } else if (postType === "code") {
-        formData.append("codeSnippet", codeSnippet);
-        formData.append("codeLanguage", codeLanguage);
-      }
-
-      // Append image file if exists
-      if (imageFile) {
-        formData.append("image", imageFile);
-      }
+      // Create post data object
+      const postData = {
+        title,
+        description,
+        tags: tags
+          .split(",")
+          .map((tag) => tag.trim())
+          .filter(Boolean),
+        platformUsage,
+        category,
+        postType,
+        linkUrl: postType === "link" ? linkUrl : undefined,
+        image: imagePreview,
+      };
 
       // Submit post to API
-      await onSubmit(formData);
+      await onSubmit(postData);
 
       // Close modal
       onClose();
@@ -213,7 +155,7 @@ const CreatePostModal = ({
     }
   };
 
-  if (!isOpen) return null;
+  if (!mounted || !isOpen) return null;
 
   return (
     <motion.div
@@ -262,7 +204,7 @@ const CreatePostModal = ({
               <label className="block text-gray-700 font-medium mb-2">
                 Post Type
               </label>
-              <div className="flex flex-wrap gap-2">
+              <div className="flex gap-2">
                 <button
                   type="button"
                   onClick={() => setPostType("text")}
@@ -288,18 +230,6 @@ const CreatePostModal = ({
                 </button>
                 <button
                   type="button"
-                  onClick={() => setPostType("poll")}
-                  className={`flex items-center px-3 py-2 rounded-lg ${
-                    postType === "poll"
-                      ? "bg-green-600 text-white"
-                      : "bg-gray-200 text-gray-700"
-                  }`}
-                >
-                  <FaPoll className="mr-1" />
-                  <span>Poll</span>
-                </button>
-                <button
-                  type="button"
                   onClick={() => setPostType("link")}
                   className={`flex items-center px-3 py-2 rounded-lg ${
                     postType === "link"
@@ -309,18 +239,6 @@ const CreatePostModal = ({
                 >
                   <FaLink className="mr-1" />
                   <span>Link</span>
-                </button>
-                <button
-                  type="button"
-                  onClick={() => setPostType("code")}
-                  className={`flex items-center px-3 py-2 rounded-lg ${
-                    postType === "code"
-                      ? "bg-green-600 text-white"
-                      : "bg-gray-200 text-gray-700"
-                  }`}
-                >
-                  <FaCode className="mr-1" />
-                  <span>Code</span>
                 </button>
               </div>
             </div>
@@ -407,55 +325,6 @@ const CreatePostModal = ({
               </div>
             )}
 
-            {postType === "poll" && (
-              <div className="mb-4">
-                <label className="block text-gray-700 font-medium mb-2">
-                  Poll Options
-                </label>
-                {pollOptions.map((option, index) => (
-                  <div key={index} className="flex mb-2">
-                    <input
-                      type="text"
-                      value={option}
-                      onChange={(e) => updatePollOption(index, e.target.value)}
-                      className={`flex-1 p-3 border ${
-                        formErrors.pollOptions
-                          ? "border-red-500"
-                          : "border-gray-300"
-                      } rounded-l-lg focus:outline-none focus:ring-2 focus:ring-green-500 text-black`}
-                      placeholder={`Option ${index + 1}`}
-                    />
-                    <button
-                      type="button"
-                      onClick={() => removePollOption(index)}
-                      className="bg-red-500 text-white px-3 rounded-r-lg hover:bg-red-600 transition-colors"
-                      disabled={pollOptions.length <= 2}
-                    >
-                      <IoMdClose size={16} />
-                    </button>
-                  </div>
-                ))}
-                <div className="flex justify-between items-center">
-                  <button
-                    type="button"
-                    onClick={addPollOption}
-                    className="mt-2 text-green-600 hover:text-green-700 text-sm font-medium"
-                    disabled={pollOptions.length >= 10}
-                  >
-                    + Add Option
-                  </button>
-                  <span className="text-xs text-gray-500">
-                    {pollOptions.length}/10 options
-                  </span>
-                </div>
-                {formErrors.pollOptions && (
-                  <p className="mt-1 text-sm text-red-500">
-                    {formErrors.pollOptions}
-                  </p>
-                )}
-              </div>
-            )}
-
             {postType === "link" && (
               <div className="mb-4">
                 <label className="block text-gray-700 font-medium mb-2">
@@ -473,46 +342,6 @@ const CreatePostModal = ({
                 {formErrors.linkUrl && (
                   <p className="mt-1 text-sm text-red-500">
                     {formErrors.linkUrl}
-                  </p>
-                )}
-              </div>
-            )}
-
-            {postType === "code" && (
-              <div className="mb-4">
-                <label className="block text-gray-700 font-medium mb-2">
-                  Code Language
-                </label>
-                <select
-                  value={codeLanguage}
-                  onChange={(e) => setCodeLanguage(e.target.value)}
-                  className="w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500 text-black mb-2"
-                >
-                  <option value="javascript">JavaScript</option>
-                  <option value="python">Python</option>
-                  <option value="java">Java</option>
-                  <option value="cpp">C++</option>
-                  <option value="html">HTML</option>
-                  <option value="css">CSS</option>
-                  <option value="php">PHP</option>
-                  <option value="sql">SQL</option>
-                </select>
-                <label className="block text-gray-700 font-medium mb-2">
-                  Code Snippet
-                </label>
-                <textarea
-                  value={codeSnippet}
-                  onChange={(e) => setCodeSnippet(e.target.value)}
-                  className={`w-full p-3 border ${
-                    formErrors.codeSnippet
-                      ? "border-red-500"
-                      : "border-gray-300"
-                  } rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500 h-32 font-mono text-black`}
-                  placeholder="Paste your code here"
-                />
-                {formErrors.codeSnippet && (
-                  <p className="mt-1 text-sm text-red-500">
-                    {formErrors.codeSnippet}
                   </p>
                 )}
               </div>
@@ -559,40 +388,6 @@ const CreatePostModal = ({
               </select>
             </div>
 
-            <div className="mb-4">
-              <label className="block text-gray-700 font-medium mb-2">
-                Visibility
-              </label>
-              <div className="flex space-x-4">
-                <label className="flex items-center">
-                  <input
-                    type="radio"
-                    name="visibility"
-                    value="public"
-                    checked={visibility === "public"}
-                    onChange={(e) => setVisibility(e.target.value)}
-                    className="mr-2"
-                  />
-                  <span className="flex items-center">
-                    <FaEye className="mr-1" /> Public
-                  </span>
-                </label>
-                <label className="flex items-center">
-                  <input
-                    type="radio"
-                    name="visibility"
-                    value="private"
-                    checked={visibility === "private"}
-                    onChange={(e) => setVisibility(e.target.value)}
-                    className="mr-2"
-                  />
-                  <span className="flex items-center">
-                    <FaEyeSlash className="mr-1" /> Private
-                  </span>
-                </label>
-              </div>
-            </div>
-
             <div className="mb-6">
               <label className="block text-gray-700 font-medium mb-2">
                 How did you use our platform?
@@ -614,7 +409,7 @@ const CreatePostModal = ({
               )}
             </div>
 
-            <div className="flex justify-between items-center mb-6">
+            <div className="mb-4">
               <button
                 type="button"
                 onClick={() => setShowPreview(!showPreview)}
@@ -627,11 +422,11 @@ const CreatePostModal = ({
 
             {showPreview && (
               <div className="mb-6 p-4 border border-gray-300 rounded-lg bg-gray-50">
-                <h3 className="text-lg font-semibold mb-2">
+                <h3 className="text-lg font-semibold mb-2 text-black">
                   {title || "Post Title"}
                 </h3>
                 {postType === "text" && (
-                  <p className="text-gray-700">
+                  <p className="text-black">
                     {description || "Post content will appear here..."}
                   </p>
                 )}
@@ -644,16 +439,6 @@ const CreatePostModal = ({
                     />
                   </div>
                 )}
-                {postType === "poll" && (
-                  <div className="my-2">
-                    {pollOptions.map((option, index) => (
-                      <div key={index} className="flex items-center mb-2">
-                        <input type="radio" name="poll" className="mr-2" />
-                        <span>{option || `Option ${index + 1}`}</span>
-                      </div>
-                    ))}
-                  </div>
-                )}
                 {postType === "link" && linkUrl && (
                   <div className="my-2">
                     <a
@@ -664,13 +449,6 @@ const CreatePostModal = ({
                     >
                       {linkUrl}
                     </a>
-                  </div>
-                )}
-                {postType === "code" && codeSnippet && (
-                  <div className="my-2">
-                    <div className="bg-gray-800 text-white p-3 rounded-lg font-mono text-sm overflow-x-auto">
-                      <pre>{codeSnippet}</pre>
-                    </div>
                   </div>
                 )}
                 <div className="mt-2 flex flex-wrap gap-2">

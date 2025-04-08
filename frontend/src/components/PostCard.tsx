@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { motion } from "framer-motion";
 import { FaHeart, FaComment, FaShare, FaEllipsisH } from "react-icons/fa";
 import Image from "next/image";
@@ -13,7 +13,7 @@ interface Comment {
 }
 
 interface Post {
-  id: string;
+  _id: string;
   title: string;
   description: string;
   image?: string;
@@ -22,38 +22,133 @@ interface Post {
   likes: number;
   comments: Comment[];
   tags: string[];
+  postType?: "text" | "image" | "poll";
+  pollOptions?: { text: string; votes: number }[];
+  totalVotes?: number;
+  userVote?: number | null;
 }
 
 interface PostCardProps {
   post: Post;
   onLike: (postId: string) => void;
   onComment: (postId: string, comment: string) => void;
+  onVote?: (postId: string, optionIndex: number) => void;
 }
 
-const PostCard = ({ post, onLike, onComment }: PostCardProps) => {
+const PostCard = ({ post, onLike, onComment, onVote }: PostCardProps) => {
   const [isLiked, setIsLiked] = useState(false);
   const [showComments, setShowComments] = useState(false);
-  const [newComment, setNewComment] = useState("");
+  const [commentText, setCommentText] = useState("");
   const [showOptions, setShowOptions] = useState(false);
+  const [mounted, setMounted] = useState(false);
+  const [likesCount, setLikesCount] = useState(post.likes);
 
-  const handleLike = () => {
-    setIsLiked(!isLiked);
-    onLike(post.id);
-  };
+  // Set mounted state after component mounts to avoid hydration mismatch
+  useEffect(() => {
+    setMounted(true);
+  }, []);
 
-  const handleComment = (e: React.FormEvent) => {
-    e.preventDefault();
-    if (newComment.trim()) {
-      onComment(post.id, newComment);
-      setNewComment("");
+  const handleLike = async () => {
+    try {
+      const response = await fetch(`/api/posts/${post._id}/like`, {
+        method: "POST",
+      });
+
+      if (response.ok) {
+        const data = await response.json();
+        setLikesCount(data.likes);
+        setIsLiked(true);
+      }
+    } catch (error) {
+      console.error("Error liking post:", error);
     }
   };
 
-  // Get author initial with fallback
-  const getAuthorInitial = (author: string | undefined) => {
-    if (!author) return "?";
-    return author[0].toUpperCase();
+  const handleComment = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!commentText.trim()) return;
+
+    try {
+      const response = await fetch(`/api/posts/${post._id}/comment`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ text: commentText }),
+      });
+
+      if (response.ok) {
+        const newComment = await response.json();
+        onComment(post._id, newComment);
+        setCommentText("");
+      }
+    } catch (error) {
+      console.error("Error commenting on post:", error);
+    }
   };
+
+  const handleShare = async () => {
+    try {
+      const shareData = {
+        title: post.title,
+        text: post.description,
+        url: `${window.location.origin}/community/post/${post._id}`,
+      };
+
+      // Check if Web Share API is available
+      if (navigator.share) {
+        await navigator.share(shareData);
+      } else {
+        // Fallback: Copy link to clipboard
+        await navigator.clipboard.writeText(shareData.url);
+        alert("Link copied to clipboard!");
+      }
+    } catch (error) {
+      console.error("Error sharing post:", error);
+    }
+  };
+
+  // Ensure comments is always an array
+  const comments = Array.isArray(post.comments) ? post.comments : [];
+
+  // Get author initial with fallback
+  const getAuthorInitial = (author: string | undefined | null) => {
+    if (!author || typeof author !== "string") return "?";
+    return author.charAt(0).toUpperCase();
+  };
+
+  // Format timestamp consistently
+  const formatTimestamp = (timestamp: string) => {
+    try {
+      const date = new Date(timestamp);
+      return date.toLocaleDateString("en-US", {
+        year: "numeric",
+        month: "short",
+        day: "numeric",
+      });
+    } catch (e) {
+      return timestamp;
+    }
+  };
+
+  // Return loading state during SSR to prevent hydration mismatch
+  if (!mounted) {
+    return (
+      <div className="bg-white rounded-lg shadow-md overflow-hidden">
+        <div className="px-4 py-3 flex items-center justify-between border-b border-gray-100">
+          <div className="flex items-center space-x-3">
+            <div className="w-10 h-10 bg-gray-200 rounded-full flex items-center justify-center">
+              <span className="text-gray-600 font-medium">?</span>
+            </div>
+            <div>
+              <h3 className="font-medium text-gray-900">Loading...</h3>
+              <p className="text-sm text-gray-500">Loading...</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <motion.div
@@ -62,7 +157,7 @@ const PostCard = ({ post, onLike, onComment }: PostCardProps) => {
       className="bg-white rounded-lg shadow-md overflow-hidden"
     >
       {/* Post Header */}
-      <div className="p-4 flex items-center justify-between">
+      <div className="px-4 py-3 flex items-center justify-between border-b border-gray-100">
         <div className="flex items-center space-x-3">
           <div className="w-10 h-10 bg-gray-200 rounded-full flex items-center justify-center">
             <span className="text-gray-600 font-medium">
@@ -73,7 +168,9 @@ const PostCard = ({ post, onLike, onComment }: PostCardProps) => {
             <h3 className="font-medium text-gray-900">
               {post.author || "Anonymous"}
             </h3>
-            <p className="text-sm text-gray-500">{post.timestamp}</p>
+            <p className="text-sm text-gray-500">
+              {formatTimestamp(post.timestamp)}
+            </p>
           </div>
         </div>
         <div className="relative">
@@ -114,8 +211,47 @@ const PostCard = ({ post, onLike, onComment }: PostCardProps) => {
         </div>
       )}
 
+      {/* Poll Section */}
+      {post.postType === "poll" && post.pollOptions && mounted && (
+        <div className="px-4 py-3">
+          <div className="space-y-2">
+            {post.pollOptions.map((option, index) => (
+              <button
+                key={index}
+                onClick={() => onVote && onVote(post._id, index)}
+                className={`w-full p-3 rounded-lg border ${
+                  post.userVote === index
+                    ? "border-green-500 bg-green-50"
+                    : "border-gray-200 hover:border-green-500"
+                }`}
+              >
+                <div className="flex justify-between items-center">
+                  <span className="text-gray-700">{option.text}</span>
+                  <span className="text-sm text-gray-500">
+                    {option.votes} votes
+                  </span>
+                </div>
+                {post.totalVotes && post.totalVotes > 0 && (
+                  <div className="mt-2 h-2 bg-gray-200 rounded-full overflow-hidden">
+                    <div
+                      className="h-full bg-green-500"
+                      style={{
+                        width: `${(option.votes / post.totalVotes) * 100}%`,
+                      }}
+                    />
+                  </div>
+                )}
+              </button>
+            ))}
+          </div>
+          <p className="mt-2 text-sm text-gray-500">
+            Total votes: {post.totalVotes || 0}
+          </p>
+        </div>
+      )}
+
       {/* Tags */}
-      <div className="px-4 mt-4 flex flex-wrap gap-2">
+      <div className="px-4 py-3 flex flex-wrap gap-2">
         {post.tags?.map((tag, index) => (
           <span
             key={index}
@@ -132,64 +268,60 @@ const PostCard = ({ post, onLike, onComment }: PostCardProps) => {
           onClick={handleLike}
           className={`flex items-center space-x-2 ${
             isLiked ? "text-red-500" : "text-gray-500"
-          }`}
+          } hover:text-red-500 transition-colors`}
         >
           <FaHeart className={isLiked ? "fill-current" : ""} />
-          <span>{post.likes}</span>
+          <span>{likesCount}</span>
         </button>
         <button
           onClick={() => setShowComments(!showComments)}
-          className="flex items-center space-x-2 text-gray-500"
+          className="text-gray-500 hover:text-gray-700 flex items-center gap-1"
         >
-          <FaComment />
-          <span>{post.comments?.length || 0}</span>
+          <FaComment className="text-sm" />
+          <span>{comments.length} Comments</span>
         </button>
-        <button className="flex items-center space-x-2 text-gray-500">
+        <button
+          onClick={handleShare}
+          className="flex items-center space-x-2 text-gray-500 hover:text-gray-700"
+        >
           <FaShare />
+          <span className="text-sm">Share</span>
         </button>
       </div>
 
       {/* Comments Section */}
-      {showComments && (
-        <div className="px-4 py-3 border-t border-gray-100">
-          <form onSubmit={handleComment} className="mb-4">
-            <div className="flex space-x-2">
-              <input
-                type="text"
-                value={newComment}
-                onChange={(e) => setNewComment(e.target.value)}
-                placeholder="Add a comment..."
-                className="flex-1 px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500"
-              />
-              <button
-                type="submit"
-                className="px-4 py-2 bg-green-500 text-white rounded-lg hover:bg-green-600 transition-colors"
-              >
-                Post
-              </button>
-            </div>
-          </form>
-          <div className="space-y-4">
-            {post.comments?.map((comment) => (
-              <div key={comment.id} className="flex space-x-3">
-                <div className="w-8 h-8 bg-gray-200 rounded-full flex items-center justify-center">
-                  <span className="text-gray-600 text-sm font-medium">
-                    {getAuthorInitial(comment.author)}
-                  </span>
-                </div>
-                <div className="flex-1">
-                  <div className="bg-gray-50 rounded-lg px-3 py-2">
-                    <p className="font-medium text-sm">
-                      {comment.author || "Anonymous"}
-                    </p>
-                    <p className="text-gray-700">{comment.text}</p>
-                  </div>
-                  <p className="text-xs text-gray-500 mt-1">
-                    {comment.timestamp}
-                  </p>
-                </div>
+      {showComments && mounted && (
+        <div className="px-4 py-2 border-t">
+          <div className="mt-2">
+            <form onSubmit={handleComment} className="mb-2">
+              <div className="flex gap-2">
+                <input
+                  type="text"
+                  value={commentText}
+                  onChange={(e) => setCommentText(e.target.value)}
+                  placeholder="Write a comment..."
+                  className="flex-1 px-3 py-1 border rounded-full text-sm focus:outline-none focus:ring-2 focus:ring-green-500"
+                />
+                <button
+                  type="submit"
+                  className="px-3 py-1 bg-green-500 text-white rounded-full text-sm hover:bg-green-600 transition-colors"
+                >
+                  Post
+                </button>
               </div>
-            ))}
+            </form>
+
+            <div className="space-y-2">
+              {comments.map((comment, index) => (
+                <div
+                  key={comment.id || index}
+                  className="bg-gray-50 p-2 rounded-lg"
+                >
+                  <p className="text-sm font-medium">{comment.author}</p>
+                  <p className="text-sm text-gray-600">{comment.text}</p>
+                </div>
+              ))}
+            </div>
           </div>
         </div>
       )}

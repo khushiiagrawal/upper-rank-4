@@ -11,9 +11,16 @@ import {
 } from "react-icons/fa";
 import { useState, useEffect } from "react";
 
+// Seeded random number generator for consistent values between server and client
+const seededRandom = (seed: number) => {
+  const x = Math.sin(seed++) * 10000;
+  return x - Math.floor(x);
+};
+
 const AboutSection = () => {
   const [activeFeature, setActiveFeature] = useState(0);
   const [showLeafAnimation, setShowLeafAnimation] = useState(false);
+  const [mounted, setMounted] = useState(false);
 
   const fadeInUp = {
     hidden: { opacity: 0, y: 20 },
@@ -41,22 +48,31 @@ const AboutSection = () => {
     },
   ];
 
+  // Only run client-side code after component has mounted
+  useEffect(() => {
+    setMounted(true);
+  }, []);
+
   // Auto-advance active feature for demo purposes
   useEffect(() => {
+    if (!mounted) return;
+
     const interval = setInterval(() => {
       setActiveFeature((prev) => (prev < 2 ? prev + 1 : 0));
     }, 4000);
     return () => clearInterval(interval);
-  }, []);
+  }, [mounted]);
 
   // Trigger leaf animation periodically
   useEffect(() => {
+    if (!mounted) return;
+
     const interval = setInterval(() => {
       setShowLeafAnimation(true);
       setTimeout(() => setShowLeafAnimation(false), 2000);
     }, 8000);
     return () => clearInterval(interval);
-  }, []);
+  }, [mounted]);
 
   return (
     <section
@@ -64,34 +80,36 @@ const AboutSection = () => {
       className="pt-16 pb-12 bg-white relative overflow-hidden"
     >
       {/* Animated leaf elements */}
-      <div className="absolute top-0 left-0 w-full h-full pointer-events-none">
-        {Array.from({ length: 8 }).map((_, i) => (
-          <motion.div
-            key={i}
-            className="absolute w-8 h-8 text-green-400 opacity-20"
-            initial={{
-              top: `${Math.random() * 100}%`,
-              left: `${Math.random() * 100}%`,
-              rotate: Math.random() * 360,
-            }}
-            animate={{
-              top: `${Math.random() * 100}%`,
-              left: `${Math.random() * 100}%`,
-              rotate: Math.random() * 360,
-              opacity: [0.2, 0.4, 0.2],
-            }}
-            transition={{
-              duration: 15 + Math.random() * 20,
-              repeat: Infinity,
-              repeatType: "reverse",
-            }}
-          >
-            <svg viewBox="0 0 24 24" fill="currentColor">
-              <path d="M12,2C6.5,2,2,6.5,2,12s4.5,10,10,10s10-4.5,10-10S17.5,2,12,2z M12,20c-4.4,0-8-3.6-8-8s3.6-8,8-8s8,3.6,8,8 S16.4,20,12,20z M12,6c-3.3,0-6,2.7-6,6s2.7,6,6,6s6-2.7,6-6S15.3,6,12,6z M12,16c-2.2,0-4-1.8-4-4s1.8-4,4-4s4,1.8,4,4 S14.2,16,12,16z" />
-            </svg>
-          </motion.div>
-        ))}
-      </div>
+      {mounted && (
+        <div className="absolute top-0 left-0 w-full h-full pointer-events-none">
+          {Array.from({ length: 8 }).map((_, i) => (
+            <motion.div
+              key={i}
+              className="absolute w-8 h-8 text-green-400 opacity-20"
+              initial={{
+                top: `${seededRandom(i * 3) * 100}%`,
+                left: `${seededRandom(i * 3 + 1) * 100}%`,
+                rotate: seededRandom(i * 3 + 2) * 360,
+              }}
+              animate={{
+                top: `${seededRandom(i * 3 + 8) * 100}%`,
+                left: `${seededRandom(i * 3 + 9) * 100}%`,
+                rotate: seededRandom(i * 3 + 10) * 360,
+                opacity: [0.2, 0.4, 0.2],
+              }}
+              transition={{
+                duration: 15 + seededRandom(i) * 20,
+                repeat: Infinity,
+                repeatType: "reverse",
+              }}
+            >
+              <svg viewBox="0 0 24 24" fill="currentColor">
+                <path d="M12,2C6.5,2,2,6.5,2,12s4.5,10,10,10s10-4.5,10-10S17.5,2,12,2z M12,20c-4.4,0-8-3.6-8-8s3.6-8,8-8s8,3.6,8,8 S16.4,20,12,20z M12,6c-3.3,0-6,2.7-6,6s2.7,6,6,6s6-2.7,6-6S15.3,6,12,6z M12,16c-2.2,0-4-1.8-4-4s1.8-4,4-4s4,1.8,4,4 S14.2,16,12,16z" />
+              </svg>
+            </motion.div>
+          ))}
+        </div>
+      )}
 
       {/* Environmental impact indicators */}
       <div className="absolute top-10 right-10 flex flex-col space-y-4 opacity-70">
