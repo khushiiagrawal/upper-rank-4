@@ -20,7 +20,7 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
     });
   }
 });
-
+// just check if the content script is loaded
 // Function to get keywords from storage
 async function getKeywords() {
   return new Promise((resolve) => {
