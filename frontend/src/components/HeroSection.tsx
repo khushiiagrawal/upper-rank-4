@@ -87,7 +87,7 @@ const HeroSection = () => {
   return (
     <div
       id="hero"
-      className="relative h-screen w-full bg-gradient-to-b from-green-900/30 via-green-800/20 to-green-700/10 overflow-hidden"
+      className="relative h-screen w-full bg-gradient-to-b from-green-900/30 via-green-800/20 to-green-700/10 overflow-hidden pt-16"
     >
       {/* Background elements */}
       <div className="absolute inset-0">
@@ -183,13 +183,13 @@ const HeroSection = () => {
           initial={{ opacity: 0, scale: 0.8 }}
           animate={{ opacity: 1, scale: 1 }}
           transition={{ duration: 0.8 }}
-          className="mb-8"
+          className="mb-4"
         >
           <h1 className="text-5xl md:text-7xl font-bold text-white mb-6 drop-shadow-lg">
             Redefining Waste Management
           </h1>
 
-          <p className="text-xl md:text-2xl text-white mb-12 max-w-2xl mx-auto drop-shadow-lg">
+          <p className="text-xl md:text-2xl text-white mb-4 max-w-2xl mx-auto drop-shadow-lg">
             Empowering sustainable choices through AI-driven intelligence for
             Reuse, Recycle, and Resale.
           </p>
