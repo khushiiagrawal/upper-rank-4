@@ -53,7 +53,7 @@ const Navbar = () => {
       animate={{ y: 0 }}
       transition={{ duration: 0.5 }}
       className={`fixed w-full z-50 transition-all duration-300 
-         bg-green-50 shadow-lg py-4`} // Adjusted to use shadow-lg for a more pronounced effect
+         bg-green-50 shadow-lg `} // Adjusted to use shadow-lg for a more pronounced effect
     >
       <div className="max-w-8xl mx-auto px-4 sm:px-6 lg:px-12">
         <div className="flex justify-between items-center">
@@ -63,11 +63,13 @@ const Navbar = () => {
               whileTap={{ scale: 0.95 }}
               className="flex items-center"
             >
+              <Link href="/">
               <img
-              src="/logo.png"
-              alt="Logo"
-              className="h-10 w-auto" // Adjusted height for the logo
+                src="/logo.png"
+                alt="Logo"
+                className="h-20 w-auto" // Adjusted height for the logo
               />
+              </Link>
             </motion.div>
           </Link>
 
@@ -77,7 +79,7 @@ const Navbar = () => {
               <Link
                 key={link.name}
                 href={link.href}
-                className={`flex items-center gap-1 text-lg font-medium transition-colors 
+                className={`flex items-center gap-1 text-xl font-medium transition-colors 
                   
                      text-green-700
                     
