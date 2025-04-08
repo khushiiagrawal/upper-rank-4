@@ -87,15 +87,15 @@ const HeroSection = () => {
   return (
     <div
       id="hero"
-      className="relative h-screen w-full bg-gradient-to-b from-green-800/20 via-green-800/20 to-green-800/20 overflow-hidden pt-16"
+      className="relative h-screen w-full bg-gradient-to-b from-green-700/20 via-green-700/40 to-green-700/20 overflow-hidden pt-16"
     >
       {/* Background elements */}
-      <div className="absolute mt-10 inset-0">
+      <div className="absolute mt-16 inset-0">
         <Canvas>
           <PerspectiveCamera makeDefault position={[0, 0, 8]} fov={45} />
           <ambientLight intensity={0.5} />
           <pointLight position={[10, 10, 10]} intensity={1} />
-          <Earth3D scale={1.1} />
+          <Earth3D scale={1.2} />
           <OrbitControls
             enableZoom={false}
             enablePan={false}
@@ -189,7 +189,7 @@ const HeroSection = () => {
             Redefining Waste Management
           </h1>
 
-          <p className="text-xl md:text-2xl text-white mb-32 max-w-2xl mx-auto drop-shadow-lg">
+          <p className="text-xl md:text-2xl text-white mb-40 max-w-2xl mx-auto drop-shadow-lg">
             Empowering sustainable choices through AI-driven intelligence for
             Reuse, Recycle, and Resale.
           </p>
