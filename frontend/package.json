@@ -9,6 +9,7 @@
     "lint": "next lint"
   },
   "dependencies": {
+    "@google/generative-ai": "^0.24.0",
     "@react-three/drei": "^10.0.6",
     "@react-three/fiber": "^9.1.2",
     "@types/three": "^0.175.0",
@@ -17,6 +18,9 @@
     "react": "^19.0.0",
     "react-dom": "^19.0.0",
     "react-icons": "^5.5.0",
+    "react-markdown": "^10.1.0",
+    "react-speech-recognition": "^4.0.0",
+    "react-webcam": "^7.2.0",
     "three": "^0.175.0"
   },
   "devDependencies": {
@@ -24,6 +28,7 @@
     "@types/node": "^20",
     "@types/react": "^19",
     "@types/react-dom": "^19",
+    "@types/react-speech-recognition": "^3.9.6",
     "autoprefixer": "^10.4.19",
     "eslint": "^9",
     "eslint-config-next": "15.2.4",

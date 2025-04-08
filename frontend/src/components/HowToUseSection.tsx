@@ -125,13 +125,6 @@ const HowToUseSection = () => {
     }
   };
 
-  // Scroll to section when component mounts
-  useEffect(() => {
-    if (sectionRef.current) {
-      sectionRef.current.scrollIntoView({ behavior: "smooth" });
-    }
-  }, []);
-
   return (
     <section
       id="how-to-use"
