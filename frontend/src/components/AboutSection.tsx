@@ -59,7 +59,10 @@ const AboutSection = () => {
   }, []);
 
   return (
-    <section id="about" className="py-20 bg-white relative overflow-hidden">
+    <section
+      id="about"
+      className="pt-16 pb-12 bg-white relative overflow-hidden"
+    >
       {/* Animated leaf elements */}
       <div className="absolute top-0 left-0 w-full h-full pointer-events-none">
         {Array.from({ length: 8 }).map((_, i) => (

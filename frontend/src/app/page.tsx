@@ -1,3 +1,5 @@
+"use client";
+
 import Navbar from "../components/Navbar";
 import HeroSection from "../components/HeroSection";
 import AboutSection from "../components/AboutSection";
@@ -26,12 +28,16 @@ export default function Home() {
       </div>
 
       <Navbar />
-      <HeroSection />
-      <AboutSection />
-      <HowToUseSection />
-      <CommunitySection />
-      <ContactSection />
-      <Footer />
+      <div className="flex flex-col">
+        <div className="h-screen">
+          <HeroSection />
+        </div>
+        <AboutSection />
+        <HowToUseSection />
+        <CommunitySection />
+        <ContactSection />
+        <Footer />
+      </div>
     </main>
   );
 }

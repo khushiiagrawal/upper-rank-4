@@ -7,8 +7,25 @@ import {
   FaChrome,
   FaCheck,
   FaArrowRight,
+  FaSearch,
+  FaLeaf,
 } from "react-icons/fa";
 import { useState, useRef, useEffect } from "react";
+
+// Seeded random number generator for consistent values between server and client
+const seededRandom = (seed: number) => {
+  const x = Math.sin(seed++) * 10000;
+  return x - Math.floor(x);
+};
+
+// Generate consistent positions based on a seed
+const generatePositions = (seed: number) => {
+  return {
+    x: seededRandom(seed) * 100,
+    y: seededRandom(seed + 1) * 100,
+    scale: 0.8 + seededRandom(seed + 2) * 0.4,
+  };
+};
 
 const HowToUseSection = () => {
   const [showCamera, setShowCamera] = useState(false);
@@ -18,7 +35,32 @@ const HowToUseSection = () => {
   const [showSuccessMessage, setShowSuccessMessage] = useState(false);
   const videoRef = useRef<HTMLVideoElement>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
-  const sectionRef = useRef<HTMLElement>(null);
+  const sectionRef = useRef<HTMLDivElement>(null);
+  const [isVisible, setIsVisible] = useState(false);
+  const [mounted, setMounted] = useState(false);
+
+  // Only run client-side code after component has mounted
+  useEffect(() => {
+    setMounted(true);
+
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        if (entry.isIntersecting) {
+          setIsVisible(true);
+          observer.disconnect();
+        }
+      },
+      { threshold: 0.1 }
+    );
+
+    if (sectionRef.current) {
+      observer.observe(sectionRef.current);
+    }
+
+    return () => {
+      observer.disconnect();
+    };
+  }, []);
 
   const fadeInUp = {
     hidden: { opacity: 0, y: 20 },
@@ -27,22 +69,22 @@ const HowToUseSection = () => {
 
   const steps = [
     {
-      icon: <FaCamera className="text-4xl text-green-500" />,
-      title: "Scan or Upload",
+      icon: <FaCamera className="w-8 h-8" />,
+      title: "Take a Photo",
       description:
-        "Take a photo of your item or upload an existing image from your device.",
+        "Capture an image of your waste using your device's camera or upload an existing photo.",
     },
     {
-      icon: <FaUpload className="text-4xl text-green-500" />,
-      title: "Get Recommendations",
+      icon: <FaSearch className="w-8 h-8" />,
+      title: "Get AI Analysis",
       description:
-        "Our AI analyzes your item and provides personalized recommendations for reuse, recycling, or resale options.",
+        "Our AI will analyze your waste and provide detailed information about its composition and recyclability.",
     },
     {
-      icon: <FaChrome className="text-4xl text-green-500" />,
-      title: "Take Action",
+      icon: <FaLeaf className="w-8 h-8" />,
+      title: "Follow Recommendations",
       description:
-        "Follow the suggested steps to responsibly dispose of your item or find a new home for it.",
+        "Receive personalized recommendations on how to properly dispose of or recycle your waste.",
     },
   ];
 
@@ -125,191 +167,149 @@ const HowToUseSection = () => {
     }
   };
 
+  // Only render animated elements after component has mounted
+  if (!mounted) {
+    return (
+      <section
+        ref={sectionRef}
+        className="py-12 bg-gradient-to-b from-green-50 to-white relative overflow-hidden"
+        id="how-to-use"
+      >
+        <div className="container mx-auto px-4">
+          <div className="text-center mb-16">
+            <h2 className="text-4xl font-bold text-gray-900 mb-4">
+              How to Use 3RVision
+            </h2>
+            <p className="text-xl text-gray-600 max-w-3xl mx-auto">
+              Our platform makes waste management simple and effective. Follow
+              these steps to get started.
+            </p>
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+            {steps.map((step, index) => (
+              <div
+                key={index}
+                className="bg-white rounded-xl shadow-lg p-8 text-center"
+              >
+                <div className="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-6 text-green-600">
+                  {step.icon}
+                </div>
+                <h3 className="text-xl font-semibold text-gray-900 mb-3">
+                  {step.title}
+                </h3>
+                <p className="text-gray-600">{step.description}</p>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+    );
+  }
+
   return (
     <section
-      id="how-to-use"
       ref={sectionRef}
-      className="py-20 bg-green-50 relative overflow-hidden"
+      className="py-12 bg-gradient-to-b from-green-50 to-white relative overflow-hidden"
+      id="how-to-use"
     >
-      {/* Animated background elements */}
-      <div className="absolute inset-0 pointer-events-none">
-        <div
-          className="absolute top-0 right-0 w-1/3 h-1/3 bg-green-200/20 rounded-full blur-3xl animate-float"
-          style={{ animationDuration: "18s" }}
-        ></div>
-        <div
-          className="absolute bottom-0 left-0 w-1/4 h-1/4 bg-green-300/20 rounded-full blur-3xl animate-float"
-          style={{ animationDuration: "14s", animationDelay: "3s" }}
-        ></div>
-
-        {/* Animated particles */}
-        {Array.from({ length: 15 }).map((_, i) => (
-          <motion.div
-            key={i}
-            className="absolute w-2 h-2 bg-green-400 rounded-full"
-            initial={{
-              x: Math.random() * 100 + "%",
-              y: Math.random() * 100 + "%",
-              opacity: 0.3 + Math.random() * 0.7,
-            }}
-            animate={{
-              y: [null, Math.random() * 100 + "%"],
-              opacity: [null, 0.3 + Math.random() * 0.7],
-            }}
-            transition={{
-              duration: 10 + Math.random() * 20,
-              repeat: Infinity,
-              repeatType: "reverse",
-            }}
-          />
-        ))}
+      {/* Background Elements */}
+      <div className="absolute inset-0 overflow-hidden">
+        {mounted && (
+          <>
+            <motion.div
+              initial={{ opacity: 0, scale: 0.8 }}
+              animate={
+                isVisible
+                  ? {
+                      opacity: 0.1,
+                      scale: generatePositions(1).scale,
+                      x: `${generatePositions(1).x}%`,
+                      y: `${generatePositions(1).y}%`,
+                    }
+                  : { opacity: 0, scale: 0.8 }
+              }
+              transition={{ duration: 1.5, delay: 0.2 }}
+              className="absolute w-64 h-64 bg-green-300 rounded-full filter blur-3xl"
+            />
+            <motion.div
+              initial={{ opacity: 0, scale: 0.8 }}
+              animate={
+                isVisible
+                  ? {
+                      opacity: 0.1,
+                      scale: generatePositions(2).scale,
+                      x: `${generatePositions(2).x}%`,
+                      y: `${generatePositions(2).y}%`,
+                    }
+                  : { opacity: 0, scale: 0.8 }
+              }
+              transition={{ duration: 1.5, delay: 0.4 }}
+              className="absolute w-64 h-64 bg-blue-300 rounded-full filter blur-3xl"
+            />
+            <motion.div
+              initial={{ opacity: 0, scale: 0.8 }}
+              animate={
+                isVisible
+                  ? {
+                      opacity: 0.1,
+                      scale: generatePositions(3).scale,
+                      x: `${generatePositions(3).x}%`,
+                      y: `${generatePositions(3).y}%`,
+                    }
+                  : { opacity: 0, scale: 0.8 }
+              }
+              transition={{ duration: 1.5, delay: 0.6 }}
+              className="absolute w-64 h-64 bg-yellow-300 rounded-full filter blur-3xl"
+            />
+          </>
+        )}
       </div>
 
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
+      <div className="container mx-auto px-4 relative z-10">
         <motion.div
-          initial="hidden"
-          whileInView="visible"
-          viewport={{ once: true, margin: "-100px" }}
-          transition={{ duration: 0.5 }}
-          variants={fadeInUp}
+          initial={{ opacity: 0, y: 20 }}
+          animate={isVisible ? { opacity: 1, y: 0 } : { opacity: 0, y: 20 }}
+          transition={{ duration: 0.8 }}
           className="text-center mb-16"
         >
-          <motion.h2
-            className="section-title"
-            initial={{ opacity: 0, y: -20 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.6 }}
-          >
+          <h2 className="text-4xl font-bold text-gray-900 mb-4">
             How to Use 3RVision
-          </motion.h2>
-          <motion.p
-            className="text-xl text-gray-700 max-w-3xl mx-auto"
-            initial={{ opacity: 0 }}
-            whileInView={{ opacity: 1 }}
-            transition={{ duration: 0.6, delay: 0.2 }}
-          >
-            Our platform makes it easy to make sustainable choices for your
-            items. Follow these simple steps to get started.
-          </motion.p>
+          </h2>
+          <p className="text-xl text-gray-600 max-w-3xl mx-auto">
+            Our platform makes waste management simple and effective. Follow
+            these steps to get started.
+          </p>
         </motion.div>
 
         <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
           {steps.map((step, index) => (
             <motion.div
               key={index}
-              initial="hidden"
-              whileInView="visible"
-              viewport={{ once: true, margin: "-100px" }}
-              transition={{ duration: 0.5, delay: index * 0.2 }}
-              variants={fadeInUp}
-              whileHover={{
-                scale: 1.03,
-                transition: { duration: 0.3 },
-                boxShadow:
-                  "0 10px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04)",
-              }}
-              className={`card bg-white relative overflow-hidden ${
-                activeStep === index ? "ring-2 ring-green-500" : ""
-              }`}
+              initial={{ opacity: 0, y: 20 }}
+              animate={isVisible ? { opacity: 1, y: 0 } : { opacity: 0, y: 20 }}
+              transition={{ duration: 0.8, delay: 0.2 + index * 0.2 }}
+              className="bg-white rounded-xl shadow-lg p-8 text-center"
             >
-              {/* Progress indicator */}
-              <div className="absolute top-0 left-0 w-full h-1 bg-green-100">
-                <motion.div
-                  className="h-full bg-green-500"
-                  initial={{ width: 0 }}
-                  animate={{ width: activeStep >= index ? "100%" : "0%" }}
-                  transition={{ duration: 1, delay: index * 0.5 }}
-                />
-              </div>
-
-              <div className="flex flex-col items-center text-center p-6">
-                <motion.div
-                  className={`mb-4 p-4 rounded-full ${
-                    activeStep >= index ? "bg-green-100" : "bg-green-50"
-                  }`}
-                  whileHover={{
-                    scale: 1.1,
-                    rotate: 360,
-                    transition: { duration: 0.5 },
-                  }}
-                >
-                  {step.icon}
-                </motion.div>
-
-                <motion.h3
-                  className="text-xl font-semibold text-gray-800 mb-2"
-                  initial={{ opacity: 0 }}
-                  whileInView={{ opacity: 1 }}
-                  transition={{ duration: 0.5, delay: 0.3 + index * 0.2 }}
-                >
-                  {step.title}
-                </motion.h3>
-
-                <motion.p
-                  className="text-gray-700"
-                  initial={{ opacity: 0 }}
-                  whileInView={{ opacity: 1 }}
-                  transition={{ duration: 0.5, delay: 0.4 + index * 0.2 }}
-                >
-                  {step.description}
-                </motion.p>
-
-                {activeStep === index && (
-                  <motion.div
-                    className="mt-4 text-green-500 flex items-center"
-                    initial={{ opacity: 0, x: -10 }}
-                    animate={{ opacity: 1, x: 0 }}
-                    transition={{ duration: 0.3 }}
-                  >
-                    <span className="mr-1">Current step</span>
-                    <FaArrowRight className="animate-pulse" />
-                  </motion.div>
-                )}
-              </div>
+              <motion.div
+                initial={{ scale: 0.8 }}
+                animate={isVisible ? { scale: 1 } : { scale: 0.8 }}
+                transition={{
+                  duration: 0.5,
+                  delay: 0.4 + index * 0.2,
+                  type: "spring",
+                }}
+                className="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-6 text-green-600"
+              >
+                {step.icon}
+              </motion.div>
+              <h3 className="text-xl font-semibold text-gray-900 mb-3">
+                {step.title}
+              </h3>
+              <p className="text-gray-600">{step.description}</p>
             </motion.div>
           ))}
         </div>
-
-        <motion.div
-          initial="hidden"
-          whileInView="visible"
-          viewport={{ once: true, margin: "-100px" }}
-          transition={{ duration: 0.5, delay: 0.6 }}
-          variants={fadeInUp}
-          className="mt-16 text-center"
-        >
-          <div className="flex flex-col md:flex-row justify-center gap-4">
-            <motion.button
-              whileHover={{
-                scale: 1.05,
-                boxShadow:
-                  "0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05)",
-              }}
-              whileTap={{ scale: 0.95 }}
-              onClick={handleScanImage}
-              className="flex items-center justify-center gap-2 px-6 py-3 bg-gradient-to-r from-green-600 to-green-500 text-white rounded-lg hover:from-green-700 hover:to-green-600 transition-all duration-300 shadow-lg relative overflow-hidden group"
-            >
-              <span className="absolute inset-0 bg-white opacity-0 group-hover:opacity-10 transition-opacity duration-300"></span>
-              <FaCamera className="text-xl" />
-              <span>{showCamera ? "Capture Image" : "Scan Image"}</span>
-            </motion.button>
-
-            <motion.button
-              whileHover={{
-                scale: 1.05,
-                boxShadow:
-                  "0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05)",
-              }}
-              whileTap={{ scale: 0.95 }}
-              onClick={handleUploadImage}
-              className="flex items-center justify-center gap-2 px-6 py-3 bg-gradient-to-r from-green-600 to-green-500 text-white rounded-lg hover:from-green-700 hover:to-green-600 transition-all duration-300 shadow-lg relative overflow-hidden group"
-            >
-              <span className="absolute inset-0 bg-white opacity-0 group-hover:opacity-10 transition-opacity duration-300"></span>
-              <FaUpload className="text-xl" />
-              <span>Upload Image</span>
-            </motion.button>
-          </div>
-        </motion.div>
       </div>
 
       {/* Camera view */}
