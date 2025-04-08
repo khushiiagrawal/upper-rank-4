@@ -1,26 +1,51 @@
 {
-    "manifest_version": 3,
-    "name": "R3Vision - Eco Filter",
-    "version": "1.0",
-    "description": "Only show biodegradable and recyclable products.",
-    "permissions": ["activeTab", "scripting"],
-    "background": {
-      "service_worker": "background.js"
-    },
-    "action": {
-      "default_popup": "popup.html",
-      "default_icon": {
-        "16": "assets/logo.png",
-        "48": "assets/logo.png",
-        "128": "assets/logo.png"
-      }
-    },
-    "content_scripts": [
-      {
-        "matches": ["<all_urls>"],
-        "js": ["content.js"]
-      }
-    ],
-    "host_permissions": ["<all_urls>"]
+  "manifest_version": 3,
+  "name": "R3Vision",
+  "version": "1.0",
+  "description": "Filter e-commerce websites to show only eco-friendly products",
+  "permissions": [
+    "activeTab",
+    "storage",
+    "scripting"
+  ],
+  "host_permissions": [
+    "*://*/*"
+  ],
+  "action": {
+    "default_popup": "popup.html",
+    "default_icon": {
+      "16": "icons/logo.png",
+      "48": "icons/logo.png",
+      "128": "icons/logo.png"
+    }
+  },
+  "background": {
+    "service_worker": "background.js"
+  },
+  "content_scripts": [
+    {
+      "matches": [
+        "*://*.amazon.com/*",
+        "*://*.amazon.in/*",
+        "*://*.amazon.co.uk/*",
+        "*://*.amazon.de/*",
+        "*://*.amazon.fr/*",
+        "*://*.amazon.it/*",
+        "*://*.amazon.es/*",
+        "*://*.amazon.ca/*",
+        "*://*.amazon.com.au/*",
+        "*://*.amazon.co.jp/*",
+        "*://*.ebay.com/*",
+        "*://*.walmart.com/*",
+        "*://*.etsy.com/*",
+        "*://*.target.com/*"
+      ],
+      "js": ["content.js"]
+    }
+  ],
+  "icons": {
+    "16": "icons/logo.png",
+    "48": "icons/logo.png",
+    "128": "icons/logo.png"
   }
-  
+}
