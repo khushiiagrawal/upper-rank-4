@@ -65,17 +65,29 @@ const HeroSection = () => {
     }
   };
 
-  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleFileChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (file) {
-      const reader = new FileReader();
-      reader.onload = (event) => {
-        const imageData = event.target?.result as string;
-        setCapturedImage(imageData);
-        // Here you would typically send the image to your backend for processing
-        console.log("Image uploaded:", imageData);
-      };
-      reader.readAsDataURL(file);
+      const formData = new FormData();
+      formData.append('image', file);
+
+      try {
+        const response = await fetch('http://localhost:8080/upload', {
+          method: 'POST',
+          body: formData,
+        });
+
+        if (!response.ok) {
+          throw new Error('Upload failed');
+        }
+
+        const data = await response.json();
+        setCapturedImage(data.url);
+        console.log('Image uploaded successfully:', data.url);
+      } catch (error) {
+        console.error('Error uploading image:', error);
+        alert('Failed to upload image. Please try again.');
+      }
     }
   };
 
