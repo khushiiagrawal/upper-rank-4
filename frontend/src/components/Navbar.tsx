@@ -53,52 +53,82 @@ const Navbar = () => {
       animate={{ y: 0 }}
       transition={{ duration: 0.5 }}
       className={`fixed w-full z-50 transition-all duration-300 
-         bg-green-50 shadow-lg `} // Adjusted to use shadow-lg for a more pronounced effect
+        ${
+          scrolled ? "bg-white/90 backdrop-blur-md shadow-md" : "bg-transparent"
+        } 
+        ${isCommunityPage ? "bg-white/90 backdrop-blur-md shadow-md" : ""}`}
     >
-      <div className="max-w-8xl mx-auto px-4 sm:px-6 lg:px-12">
-        <div className="flex justify-between items-center">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div className="flex justify-between items-center h-16">
           <Link href="/" className="flex items-center">
             <motion.div
               whileHover={{ scale: 1.05 }}
               whileTap={{ scale: 0.95 }}
               className="flex items-center"
             >
-              <Link href="/">
-              <img
-                src="/logo.png"
-                alt="Logo"
-                className="h-20 w-auto" // Adjusted height for the logo
-              />
-              </Link>
+              <img src="/logo.png" alt="Logo" className="h-12 w-auto" />
             </motion.div>
           </Link>
 
           {/* Desktop Navigation */}
-          <div className="hidden md:flex items-center space-x-8">
+          <div className="hidden md:flex items-center space-x-6">
             {navLinks.map((link) => (
               <Link
                 key={link.name}
                 href={link.href}
-                className={`flex items-center gap-1 text-xl font-medium transition-colors 
-                  
-                     text-green-700
-                    
+                className={`flex items-center gap-2 text-base font-medium transition-all duration-300
+                  ${
+                    pathname === link.href
+                      ? scrolled || isCommunityPage
+                        ? "text-emerald-600 scale-105"
+                        : "text-white scale-105"
+                      : scrolled || isCommunityPage
+                      ? "text-gray-700 hover:text-emerald-600"
+                      : "text-white/90 hover:text-white"
+                  }
+                  hover:scale-105 active:scale-95
+                  relative group
                 `}
               >
-                <span className="text-base">{link.icon}</span> {/* Adjusted icon size */}
+                <span className="text-base transition-transform duration-300 group-hover:scale-110">
+                  {link.icon}
+                </span>
                 {link.name}
+                <span
+                  className={`absolute -bottom-1 left-0 w-0 h-0.5 transition-all duration-300
+                  ${
+                    pathname === link.href
+                      ? scrolled || isCommunityPage
+                        ? "bg-emerald-500"
+                        : "bg-white"
+                      : scrolled || isCommunityPage
+                      ? "bg-emerald-500"
+                      : "bg-white"
+                  }
+                  ${pathname === link.href ? "w-full" : "group-hover:w-full"}`}
+                />
               </Link>
             ))}
           </div>
 
           {/* Mobile Navigation Button */}
           <div className="md:hidden">
-            <button
+            <motion.button
+              whileHover={{ scale: 1.1 }}
+              whileTap={{ scale: 0.9 }}
               onClick={() => setIsOpen(!isOpen)}
-              className="text-gray-700 hover:text-green-600 focus:outline-none"
+              className={`p-2 rounded-lg transition-colors duration-300
+                ${
+                  isOpen
+                    ? "bg-emerald-50 text-emerald-600"
+                    : scrolled || isCommunityPage
+                    ? "text-gray-700 hover:bg-emerald-50 hover:text-emerald-600"
+                    : "text-white hover:bg-white/10"
+                }
+              `}
             >
-              {isOpen ? <FaTimes size={24} /> : <FaBars size={24} />}
-            </button>
+              {isOpen ? <FaTimes size={20} /> : <FaBars size={20} />}
+            </motion.button>
           </div>
         </div>
       </div>
@@ -111,9 +141,14 @@ const Navbar = () => {
           height: isOpen ? "auto" : 0,
         }}
         transition={{ duration: 0.3 }}
-        className={`md:hidden overflow-hidden ${
-          scrolled ? "bg-white" : "bg-white/90 backdrop-blur-sm"
-        }`}
+        className={`md:hidden overflow-hidden
+          ${
+            scrolled
+              ? "bg-white/90 backdrop-blur-md"
+              : "bg-white/90 backdrop-blur-md"
+          }
+          border-t border-gray-100
+        `}
       >
         <div className="px-4 pt-2 pb-3 space-y-1">
           {navLinks.map((link) => (
@@ -121,12 +156,17 @@ const Navbar = () => {
               key={link.name}
               href={link.href}
               onClick={() => setIsOpen(false)}
-              className={`flex items-center gap-2 px-3 py-2 rounded-md text-lg font-medium 
-              hover:bg-green-200 transition-colors 
-                  
+              className={`flex items-center gap-2 px-4 py-2.5 rounded-lg text-base font-medium 
+                transition-all duration-300
+                ${
+                  pathname === link.href
+                    ? "bg-emerald-50 text-emerald-600"
+                    : "text-gray-700 hover:bg-emerald-50 hover:text-emerald-600"
+                }
+                hover:scale-[1.02] active:scale-[0.98]
               `}
             >
-              <span>{link.icon}</span>
+              <span className="text-base">{link.icon}</span>
               {link.name}
             </Link>
           ))}
