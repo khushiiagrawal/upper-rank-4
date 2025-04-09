@@ -110,7 +110,7 @@ const SignupModal = ({
                     onChange={(e) => setName(e.target.value)}
                     required
                     placeholder="Full name"
-                    className="w-full pl-10 pr-4 py-3 bg-gray-50 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-transparent"
+                    className="w-full pl-10 pr-4 py-3 text-black bg-gray-50 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-transparent"
                   />
                 </div>
 
@@ -124,7 +124,7 @@ const SignupModal = ({
                     onChange={(e) => setEmail(e.target.value)}
                     required
                     placeholder="Email address"
-                    className="w-full pl-10 pr-4 py-3 bg-gray-50 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-transparent"
+                    className="w-full pl-10 pr-4 py-3 text-black bg-gray-50 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-transparent"
                   />
                 </div>
 
@@ -138,7 +138,7 @@ const SignupModal = ({
                     onChange={(e) => setPassword(e.target.value)}
                     required
                     placeholder="Password"
-                    className="w-full pl-10 pr-4 py-3 bg-gray-50 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-transparent"
+                    className="w-full pl-10 pr-4 py-3 text-black bg-gray-50 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-transparent"
                   />
                 </div>
 
@@ -152,7 +152,7 @@ const SignupModal = ({
                     onChange={(e) => setConfirmPassword(e.target.value)}
                     required
                     placeholder="Confirm password"
-                    className="w-full pl-10 pr-4 py-3 bg-gray-50 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-transparent"
+                    className="w-full pl-10 pr-4 py-3 bg-gray-50 border text-black border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-transparent"
                   />
                 </div>
 
