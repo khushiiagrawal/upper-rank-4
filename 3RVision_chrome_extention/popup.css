@@ -4,6 +4,7 @@ body {
   margin: 0;
   padding: 10px;
   color: #333;
+  background: linear-gradient(135deg, #e0f7fa, #80deea);
 }
 
 .container {

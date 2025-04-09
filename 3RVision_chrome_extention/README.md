@@ -17,12 +17,14 @@ R3Vision is a Chrome extension that helps users find eco-friendly products on e-
 The extension consists of three main components:
 
 - **Content Script** (`content.js`): Runs on e-commerce websites and handles:
+
   - Search query modification
   - Product filtering
   - Dynamic content monitoring
   - User interface updates
 
 - **Background Script** (`background.js`): Handles:
+
   - Extension installation setup
   - Default keyword initialization
   - Tab monitoring
@@ -30,16 +32,18 @@ The extension consists of three main components:
 
 - **Popup Interface** (`popup.html`, `popup.js`, `popup.css`): Provides:
   - Extension toggle switch
-  - Keyword management
   - Status display
+  - Fancy gradient background for a modern look
 
 ### 2. Search Enhancement Process
 
 1. **Query Detection**:
+
    - Monitors search input fields on e-commerce sites
    - Identifies when a new search is performed
 
 2. **Query Modification**:
+
    - Checks if the current search contains eco-friendly terms
    - If not, appends a random eco-friendly term from the predefined list
    - Automatically submits the modified search
@@ -64,11 +68,13 @@ The extension consists of three main components:
 ### 3. Product Filtering Process
 
 1. **Product Detection**:
+
    - Uses site-specific selectors to identify product containers
    - Supports multiple e-commerce site layouts
    - Handles dynamic content loading
 
 2. **Content Analysis**:
+
    - Extracts product titles and descriptions
    - Checks for eco-friendly keywords
    - Analyzes product attributes and specifications
@@ -88,12 +94,14 @@ The extension consists of three main components:
 ## Usage Guide
 
 1. **Installation**:
+
    - Download the extension files
    - Open Chrome and go to `chrome://extensions/`
    - Enable "Developer mode"
    - Click "Load unpacked" and select the extension directory
 
 2. **Basic Usage**:
+
    - Go to any supported e-commerce site
    - Search for a product (e.g., "water bottle")
    - Click the extension icon
@@ -124,6 +132,7 @@ The extension consists of three main components:
 ## Development
 
 ### File Structure
+
 ```
 R3Vision/
 ├── manifest.json
@@ -134,10 +143,10 @@ R3Vision/
 ├── popup.css
 └── icons/
     ├── logo.png
-    └── ...
 ```
 
 ### Building
+
 1. Clone the repository
 2. Install dependencies (if any)
 3. Make modifications
@@ -162,3 +171,18 @@ This project is licensed under the MIT License - see the LICENSE file for detail
 - Price comparison for eco-friendly products
 - Carbon footprint estimation
 - User reviews analysis for sustainability claims
+
+Eco Score: 85%
+
+```
+Material Composition:
+organic cotton    60% [=====]
+recycled polyester 40% [====]
+
+♻️ Recyclable
+🌱 Biodegradable
+
+Review: Excellent eco-friendly choice! 🌟
+```
+
+### Screenshot

@@ -61,56 +61,7 @@ document.addEventListener('DOMContentLoaded', function() {
       }
     });
   });
-  
-  // Save keywords
-  saveBtn.addEventListener('click', function() {
-    const keywords = keywordsTextarea.value.trim();
-    chrome.storage.local.set({ keywords: keywords }, function() {
-      showNotification('Keywords saved!');
-      
-      // Update content script with new keywords
-      chrome.tabs.query({active: true, currentWindow: true}, function(tabs) {
-        if (tabs[0]) {
-          try {
-            chrome.tabs.sendMessage(tabs[0].id, { 
-              action: 'updateKeywords', 
-              keywords: keywords.split('\n').map(k => k.trim().toLowerCase()).filter(k => k)
-            }).catch(() => {
-              // If content script is not ready, show a notification
-              showNotification('Please refresh the page to apply changes', 'warning');
-            });
-          } catch (error) {
-            showNotification('Please refresh the page to apply changes', 'warning');
-          }
-        }
-      });
-    });
-  });
-  
-  // Reset to default keywords
-  resetBtn.addEventListener('click', function() {
-    keywordsTextarea.value = defaultKeywords;
-    chrome.storage.local.set({ keywords: defaultKeywords }, function() {
-      showNotification('Reset to default keywords!');
-      
-      // Update content script with default keywords
-      chrome.tabs.query({active: true, currentWindow: true}, function(tabs) {
-        if (tabs[0]) {
-          try {
-            chrome.tabs.sendMessage(tabs[0].id, { 
-              action: 'updateKeywords', 
-              keywords: defaultKeywords.split('\n').map(k => k.trim().toLowerCase()).filter(k => k)
-            }).catch(() => {
-              // If content script is not ready, show a notification
-              showNotification('Please refresh the page to apply changes', 'warning');
-            });
-          } catch (error) {
-            showNotification('Please refresh the page to apply changes', 'warning');
-          }
-        }
-      });
-    });
-  });
+
   
   function updateStatusDisplay(enabled) {
     if (enabled) {
