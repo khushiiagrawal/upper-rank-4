@@ -54,11 +54,11 @@ const Navbar = () => {
       transition={{ duration: 0.5 }}
       className={`fixed w-full z-50 transition-all duration-300 
         ${
-          scrolled ? "bg-white/90 backdrop-blur-md shadow-md" : "bg-transparent"
+          scrolled ? "bg-green-50 backdrop-blur-md shadow-md" : "bg-transparent"
         } 
-        ${isCommunityPage ? "bg-white/90 backdrop-blur-md shadow-md" : ""}`}
+        ${isCommunityPage ? "bg-green-50 backdrop-blur-md shadow-md" : ""}`}
     >
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div className="max-w-8xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex justify-between items-center h-16">
           <Link href="/" className="flex items-center">
             <motion.div
@@ -66,7 +66,7 @@ const Navbar = () => {
               whileTap={{ scale: 0.95 }}
               className="flex items-center"
             >
-              <img src="/logo.png" alt="Logo" className="h-12 w-auto" />
+              <img src="/logo.png" alt="Logo" className="h-20 mt-3 w-auto" />
             </motion.div>
           </Link>
 
@@ -76,7 +76,7 @@ const Navbar = () => {
               <Link
                 key={link.name}
                 href={link.href}
-                className={`flex items-center gap-2 text-base font-medium transition-all duration-300
+                className={`flex items-center gap-2 text-base text-lg transition-all duration-300
                   ${
                     pathname === link.href
                       ? scrolled || isCommunityPage
