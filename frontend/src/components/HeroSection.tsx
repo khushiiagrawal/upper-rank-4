@@ -178,18 +178,18 @@ const HeroSection = () => {
       />
 
       {/* Content */}
-      <div className="relative z-20 flex flex-col items-center justify-center h-full text-center px-4">
+      <div className="relative z-10 flex flex-col items-center justify-center h-full text-center px-4">
         <motion.div
           initial={{ opacity: 0, scale: 0.8 }}
           animate={{ opacity: 1, scale: 1 }}
           transition={{ duration: 0.8 }}
-          className="mb-4"
+          className="mb-2"
         >
-          <h1 className="text-5xl md:text-6xl font-bold text-white mb-6 drop-shadow-lg">
+          <h1 className="text-5xl md:text-6xl font-bold text-white mb-3 drop-shadow-lg">
             Redefining Waste Management
           </h1>
 
-          <p className="text-xl md:text-2xl text-white mb-40 max-w-2xl mx-auto drop-shadow-lg">
+          <p className="text-xl md:text-2xl text-white mb-8 max-w-2xl mx-auto drop-shadow-lg">
             Empowering sustainable choices through AI-driven intelligence for
             Reuse, Recycle, and Resale.
           </p>
