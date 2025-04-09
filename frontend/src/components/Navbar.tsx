@@ -36,16 +36,16 @@ const Navbar = () => {
   const navLinks = isCommunityPage
     ? [{ name: "Home", href: "/", icon: <FaHome /> }]
     : [
-        { name: "Home", href: "/", icon: <FaHome /> },
-        { name: "About", href: "/#about", icon: <FaInfoCircle /> },
-        {
-          name: "How to Use",
-          href: "/#how-to-use",
-          icon: <FaQuestionCircle />,
-        },
-        { name: "Community", href: "/community", icon: <FaUsers /> },
-        { name: "Contact", href: "/#contact", icon: <FaEnvelope /> },
-      ];
+      { name: "Home", href: "/", icon: <FaHome /> },
+      { name: "About", href: "/#about", icon: <FaInfoCircle /> },
+      {
+        name: "How to Use",
+        href: "/#how-to-use",
+        icon: <FaQuestionCircle />,
+      },
+      { name: "Community", href: "/community", icon: <FaUsers /> },
+      { name: "Contact", href: "/#contact", icon: <FaEnvelope /> },
+    ];
 
   return (
     <motion.nav
@@ -53,8 +53,7 @@ const Navbar = () => {
       animate={{ y: 0 }}
       transition={{ duration: 0.5 }}
       className={`fixed w-full z-50 transition-all duration-300 
-        ${
-          scrolled ? "bg-green-50 backdrop-blur-md shadow-md" : "bg-transparent"
+        ${scrolled ? "bg-green-50 backdrop-blur-md shadow-md" : "bg-transparent"
         } 
         ${isCommunityPage ? "bg-green-50 backdrop-blur-md shadow-md" : ""}`}
     >
@@ -77,18 +76,10 @@ const Navbar = () => {
                 key={link.name}
                 href={link.href}
                 className={`flex items-center gap-2 text-base md:text-lg transition-all duration-300
-                  ${
-                    pathname === link.href
-                      ? scrolled || isCommunityPage
-                        ? "text-emerald-600 scale-105"
-                        : "text-white scale-105"
-                      : scrolled || isCommunityPage
-                      ? "text-gray-700 hover:text-emerald-600"
-                      : "text-white/90 hover:text-white"
-                  }
-                  hover:scale-105 active:scale-95
-                  relative group
-                `}
+        ${scrolled || isCommunityPage
+                    ? "text-gray-700 hover:text-emerald-600"
+                    : "text-white/90 hover:text-white"}
+        hover:scale-105 active:scale-95 relative group`}
               >
                 <span className="text-base transition-transform duration-300 group-hover:scale-110">
                   {link.icon}
@@ -96,20 +87,13 @@ const Navbar = () => {
                 {link.name}
                 <span
                   className={`absolute -bottom-1 left-0 w-0 h-0.5 transition-all duration-300
-                  ${
-                    pathname === link.href
-                      ? scrolled || isCommunityPage
-                        ? "bg-emerald-500"
-                        : "bg-white"
-                      : scrolled || isCommunityPage
-                      ? "bg-emerald-500"
-                      : "bg-white"
-                  }
-                  ${pathname === link.href ? "w-full" : "group-hover:w-full"}`}
+          ${scrolled || isCommunityPage ? "bg-emerald-500" : "bg-white"}
+          group-hover:w-full`}
                 />
               </Link>
             ))}
           </div>
+
 
           {/* Mobile Navigation Button */}
           <div className="md:hidden">
@@ -118,10 +102,9 @@ const Navbar = () => {
               whileTap={{ scale: 0.9 }}
               onClick={() => setIsOpen(!isOpen)}
               className={`p-2 rounded-lg transition-colors duration-300
-                ${
-                  isOpen
-                    ? "bg-emerald-50 text-emerald-600"
-                    : scrolled || isCommunityPage
+                ${isOpen
+                  ? "bg-emerald-50 text-emerald-600"
+                  : scrolled || isCommunityPage
                     ? "text-gray-700 hover:bg-emerald-50 hover:text-emerald-600"
                     : "text-white hover:bg-white/10"
                 }
@@ -142,10 +125,9 @@ const Navbar = () => {
         }}
         transition={{ duration: 0.3 }}
         className={`md:hidden overflow-hidden
-          ${
-            scrolled
-              ? "bg-white/90 backdrop-blur-md"
-              : "bg-white/90 backdrop-blur-md"
+          ${scrolled
+            ? "bg-white/90 backdrop-blur-md"
+            : "bg-white/90 backdrop-blur-md"
           }
           border-t border-gray-100
         `}
@@ -158,10 +140,9 @@ const Navbar = () => {
               onClick={() => setIsOpen(false)}
               className={`flex items-center gap-2 px-4 py-2.5 rounded-lg text-base font-medium 
                 transition-all duration-300
-                ${
-                  pathname === link.href
-                    ? "bg-emerald-50 text-emerald-600"
-                    : "text-gray-700 hover:bg-emerald-50 hover:text-emerald-600"
+                ${pathname === link.href
+                  ? "bg-emerald-50 text-emerald-600"
+                  : "text-gray-700 hover:bg-emerald-50 hover:text-emerald-600"
                 }
                 hover:scale-[1.02] active:scale-[0.98]
               `}

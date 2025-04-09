@@ -87,7 +87,7 @@ const HeroSection = () => {
   return (
     <div
       id="hero"
-      className="relative h-screen w-full bg-gradient-to-b from-green-700/20 via-green-700/40 to-green-700/20 overflow-hidden pt-16"
+      className="relative h-screen w-full bg-gradient-to-b from-green-900/10 via-teal-900/70 to-green-900/40 overflow-hidden pt-16"
     >
       {/* Background elements */}
       <div className="absolute mt-16 inset-0">
@@ -95,7 +95,7 @@ const HeroSection = () => {
           <PerspectiveCamera makeDefault position={[0, 0, 8]} fov={45} />
           <ambientLight intensity={0.5} />
           <pointLight position={[10, 10, 10]} intensity={1} />
-          <Earth3D scale={1.2} />
+          <Earth3D scale={1.3} />
           <OrbitControls
             enableZoom={false}
             enablePan={false}
