@@ -35,9 +35,10 @@ const Footer = () => {
               viewport={{ once: true }}
               transition={{ duration: 0.5 }}
             >
-              <h3 className="text-2xl font-bold text-green-400 mb-4">
-                3RVision
-              </h3>
+              <Link href="/" className="flex items-center">
+           
+              <img src="/logo.png" alt="Logo" className="h-24 w-auto" />
+              </Link>
               <p className="text-gray-400 mb-4">
                 Redefining waste management through AI-driven intelligence for a
                 sustainable future.

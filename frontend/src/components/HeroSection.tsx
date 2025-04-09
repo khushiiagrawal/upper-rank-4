@@ -87,7 +87,7 @@ const HeroSection = () => {
   return (
     <div
       id="hero"
-      className="relative h-screen w-full bg-gradient-to-b from-green-700/20 via-green-700/40 to-green-700/20 overflow-hidden pt-16"
+      className="relative h-screen w-full bg-gradient-to-b from-green-900/10 via-teal-900/70 to-green-900/40 overflow-hidden pt-16"
     >
       {/* Background elements */}
       <div className="absolute mt-16 inset-0">
@@ -95,7 +95,7 @@ const HeroSection = () => {
           <PerspectiveCamera makeDefault position={[0, 0, 8]} fov={45} />
           <ambientLight intensity={0.5} />
           <pointLight position={[10, 10, 10]} intensity={1} />
-          <Earth3D scale={1.2} />
+          <Earth3D scale={1.3} />
           <OrbitControls
             enableZoom={false}
             enablePan={false}
@@ -178,18 +178,18 @@ const HeroSection = () => {
       />
 
       {/* Content */}
-      <div className="relative z-20 flex flex-col items-center justify-center h-full text-center px-4">
+      <div className="relative z-10 flex flex-col items-center justify-center h-full text-center px-4">
         <motion.div
           initial={{ opacity: 0, scale: 0.8 }}
           animate={{ opacity: 1, scale: 1 }}
           transition={{ duration: 0.8 }}
-          className="mb-4"
+          className="mb-2"
         >
-          <h1 className="text-5xl md:text-6xl font-bold text-white mb-6 drop-shadow-lg">
+          <h1 className="text-5xl md:text-6xl font-bold text-white mb-3 drop-shadow-lg">
             Redefining Waste Management
           </h1>
 
-          <p className="text-xl md:text-2xl text-white mb-40 max-w-2xl mx-auto drop-shadow-lg">
+          <p className="text-xl md:text-2xl text-white mb-8 max-w-2xl mx-auto drop-shadow-lg">
             Empowering sustainable choices through AI-driven intelligence for
             Reuse, Recycle, and Resale.
           </p>

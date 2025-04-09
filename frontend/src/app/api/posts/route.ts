@@ -1,8 +1,6 @@
 import { NextResponse } from 'next/server';
 import clientPromise from '@/lib/mongodb';
 import { ObjectId } from 'mongodb';
-import { writeFile } from 'fs/promises';
-import path from 'path';
 
 // GET /api/posts - Get all posts
 export async function GET() {
@@ -31,65 +29,37 @@ export async function POST(request: Request) {
     const client = await clientPromise;
     const db = client.db('3rvision');
     
-    // Parse the request body
-    const formData = await request.formData();
+    // Parse the request body as JSON
+    const data = await request.json();
     
-    // Extract text fields
-    const title = formData.get('title') as string;
-    const description = formData.get('description') as string;
-    const tags = formData.get('tags') as string;
-    const platformUsage = formData.get('platformUsage') as string;
-    
-    // Handle image file
-    const imageFile = formData.get('image') as File | null;
-    let imageUrl = '';
-    
-    if (imageFile) {
-      // Create a unique filename
-      const bytes = await imageFile.arrayBuffer();
-      const buffer = Buffer.from(bytes);
-      
-      // Create uploads directory if it doesn't exist
-      const uploadDir = path.join(process.cwd(), 'public', 'uploads');
-      try {
-        await writeFile(path.join(uploadDir, 'dummy.txt'), '');
-      } catch (error) {
-        // Directory doesn't exist, create it
-        await writeFile(path.join(uploadDir, 'dummy.txt'), '');
-      }
-      
-      // Generate a unique filename
-      const uniqueSuffix = `${Date.now()}-${Math.round(Math.random() * 1E9)}`;
-      const filename = `${uniqueSuffix}-${imageFile.name}`;
-      const filepath = path.join(uploadDir, filename);
-      
-      // Write the file
-      await writeFile(filepath, buffer);
-      
-      // Set the image URL
-      imageUrl = `/uploads/${filename}`;
-    }
-    
-    // Convert tags string to array
-    const tagsArray = tags
-      ? tags.split(',').map(tag => tag.trim()).filter(tag => tag !== '')
-      : [];
+    // Extract fields from the request body
+    const {
+      title,
+      description,
+      tags,
+      platformUsage,
+      category,
+      postType,
+      linkUrl,
+      image
+    } = data;
     
     // Create post object
     const post = {
       title,
       description,
-      imageUrl,
-      tags: tagsArray,
+      image,
+      tags: Array.isArray(tags) ? tags : [],
       platformUsage,
-      author: {
-        name: "User", // This would come from user authentication
-        avatar: "https://ui-avatars.com/api/?name=User&background=0D9488&color=fff",
-      },
-      createdAt: new Date().toISOString(),
+      category,
+      postType: postType || 'text',
+      linkUrl,
+      author: "Anonymous", // This would come from user authentication
+      timestamp: new Date().toISOString(),
       likes: 0,
-      comments: 0,
-      commentList: []
+      comments: [],
+      totalVotes: 0,
+      userVote: null
     };
     
     // Insert post into database
