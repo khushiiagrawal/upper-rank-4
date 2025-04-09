@@ -43,6 +43,9 @@ const ChatBot = () => {
   const [darkMode, setDarkMode] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
   const [showSearch, setShowSearch] = useState(false);
+  const [showWelcomeAnimation, setShowWelcomeAnimation] = useState(false);
+  const [welcomeAnimationComplete, setWelcomeAnimationComplete] =
+    useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
   const messagesEndRef = useRef<HTMLDivElement>(null);
 
@@ -71,6 +74,21 @@ const ChatBot = () => {
     }
   }, [showTooltip]);
 
+  // Welcome animation effect
+  useEffect(() => {
+    if (isOpen && !welcomeAnimationComplete) {
+      setShowWelcomeAnimation(true);
+      // No auto-hide timer here - will stay visible until user interacts
+    }
+  }, [isOpen, welcomeAnimationComplete]);
+
+  const hideWelcomeAnimation = () => {
+    if (showWelcomeAnimation) {
+      setShowWelcomeAnimation(false);
+      setWelcomeAnimationComplete(true);
+    }
+  };
+
   // Simulate upload progress
   useEffect(() => {
     if (isUploading) {
@@ -98,6 +116,8 @@ const ChatBot = () => {
 
   const handleSend = async () => {
     if (!input.trim()) return;
+
+    hideWelcomeAnimation(); // Add this line
 
     const userMessage: Message = {
       type: "user",
@@ -401,7 +421,63 @@ const ChatBot = () => {
                 </div>
               )}
 
-              <div className="flex-1 overflow-y-auto p-4 space-y-4 scrollbar-hide">
+              <div className="flex-1 overflow-y-auto p-4 space-y-4 scrollbar-hide relative">
+                {/* Welcome Animation */}
+                {showWelcomeAnimation && (
+                  <motion.div
+                    className="absolute inset-0 flex items-center justify-center z-10 bg-opacity-90 pointer-events-none"
+                    initial={{ opacity: 0 }}
+                    animate={{ opacity: 1 }}
+                    exit={{ opacity: 0 }}
+                  >
+                    <motion.div
+                      className="text-center p-6 rounded-lg"
+                      initial={{ scale: 0.9 }}
+                      animate={{ scale: 1 }}
+                      transition={{ duration: 0.5 }}
+                    >
+                      <div className="relative inline-block">
+                        <motion.div
+                          className="overflow-hidden"
+                          initial={{ width: "0%" }}
+                          animate={{ width: "100%" }}
+                          transition={{ duration: 3, ease: "easeInOut" }}
+                        >
+                          <motion.h2
+                            className="text-3xl font-bold bg-gradient-to-r from-green-600 to-green-400 bg-clip-text text-transparent"
+                            initial={{ opacity: 0 }}
+                            animate={{ opacity: 1 }}
+                            transition={{ delay: 0.5, duration: 1 }}
+                          >
+                            Hello! I'm EcoBot 🌱
+                          </motion.h2>
+                        </motion.div>
+                        <motion.p
+                          className={`mt-2 text-lg ${
+                            darkMode ? "text-gray-200" : "text-gray-700"
+                          }`}
+                          initial={{ opacity: 0, y: 10 }}
+                          animate={{ opacity: 1, y: 0 }}
+                          transition={{ delay: 1.5, duration: 0.8 }}
+                        >
+                          Your sustainable AI assistant
+                        </motion.p>
+                        <motion.p
+                          className={`mt-3 ${
+                            darkMode ? "text-gray-300" : "text-gray-600"
+                          }`}
+                          initial={{ opacity: 0, y: 10 }}
+                          animate={{ opacity: 1, y: 0 }}
+                          transition={{ delay: 2.5, duration: 0.8 }}
+                        >
+                          Ask me about recycling, eco-friendly tips, or how to
+                          reduce your carbon footprint!
+                        </motion.p>
+                      </div>
+                    </motion.div>
+                  </motion.div>
+                )}
+
                 {filteredMessages.map((message, index) => (
                   <motion.div
                     key={index}
@@ -554,7 +630,10 @@ const ChatBot = () => {
                   <input
                     type="text"
                     value={input}
-                    onChange={(e) => setInput(e.target.value)}
+                    onChange={(e) => {
+                      setInput(e.target.value);
+                      hideWelcomeAnimation(); // Add this
+                    }}
                     onKeyPress={(e) => e.key === "Enter" && handleSend()}
                     placeholder="Type your message..."
                     className={`flex-1 p-2 border ${
