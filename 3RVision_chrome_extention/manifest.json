@@ -1,6 +1,6 @@
 {
   "manifest_version": 3,
-  "name": "R3Vision",
+  "name": "3RVision",
   "version": "1.0",
   "description": "Filter e-commerce websites to show only eco-friendly products",
   "permissions": [
@@ -38,7 +38,10 @@
         "*://*.ebay.com/*",
         "*://*.walmart.com/*",
         "*://*.etsy.com/*",
-        "*://*.target.com/*"
+        "*://*.target.com/*",
+        "*://*.myntra.com/*",
+        "*://*.jiomart.com/*",
+        "*://*.flipkart.com/*"
       ],
       "js": ["content.js"]
     }
