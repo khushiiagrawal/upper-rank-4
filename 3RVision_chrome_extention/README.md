@@ -134,7 +134,6 @@ R3Vision/
 ├── popup.css
 └── icons/
     ├── logo.png
-    └── ...
 ```
 
 ### Building
