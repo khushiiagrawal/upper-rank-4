@@ -29,7 +29,7 @@ interface Comment {
 
 // Define the Post type to match PostCard component
 interface Post {
-  id: string;
+  _id: string;
   title: string;
   description: string;
   image?: string;
@@ -38,25 +38,27 @@ interface Post {
   likes: number;
   comments: Comment[];
   tags: string[];
+  postType?: "text" | "image" | "poll";
+  pollOptions?: { text: string; votes: number }[];
+  totalVotes?: number;
+  userVote?: number | null;
 }
 
 // Define the API response type
 interface ApiPost {
-  _id?: string;
-  id?: string;
+  _id: string;
   title: string;
   description: string;
-  imageUrl?: string;
   image?: string;
-  author?: {
-    name?: string;
-    avatar?: string;
-  };
-  createdAt?: string;
-  timestamp?: string;
-  likes?: number;
-  comments?: Comment[];
-  tags?: string[];
+  author: string;
+  timestamp: string;
+  likes: number;
+  comments: Comment[];
+  tags: string[];
+  postType?: "text" | "image" | "poll";
+  pollOptions?: { text: string; votes: number }[];
+  totalVotes?: number;
+  userVote?: number | null;
 }
 
 // Main Community Page component
@@ -78,18 +80,40 @@ const CommunityPage = () => {
         const data = await response.json();
 
         // Transform the data to match our Post interface
-        const transformedPosts = data.map((post: ApiPost) => ({
-          id: post._id || post.id || Date.now().toString(),
-          title: post.title,
-          description: post.description,
-          image: post.imageUrl || post.image,
-          author: post.author?.name || "Anonymous",
-          timestamp:
-            post.createdAt || post.timestamp || new Date().toISOString(),
-          likes: post.likes || 0,
-          comments: post.comments || [],
-          tags: post.tags || [],
-        }));
+        const transformedPosts = data.map((post: ApiPost) => {
+          // Ensure all required fields have default values and proper types
+          return {
+            _id: post._id || "",
+            title: post.title || "",
+            description: post.description || "",
+            image: post.image || "",
+            author: typeof post.author === "string" ? post.author : "Anonymous",
+            timestamp: post.timestamp || new Date().toISOString(),
+            likes: typeof post.likes === "number" ? post.likes : 0,
+            comments: Array.isArray(post.comments)
+              ? post.comments.map((comment) => ({
+                  id: comment.id || "",
+                  text: comment.text || "",
+                  author:
+                    typeof comment.author === "string"
+                      ? comment.author
+                      : "Anonymous",
+                  timestamp: comment.timestamp || new Date().toISOString(),
+                }))
+              : [],
+            tags: Array.isArray(post.tags) ? post.tags : [],
+            postType: post.postType || "text",
+            pollOptions: Array.isArray(post.pollOptions)
+              ? post.pollOptions.map((option) => ({
+                  text: option.text || "",
+                  votes: typeof option.votes === "number" ? option.votes : 0,
+                }))
+              : [],
+            totalVotes:
+              typeof post.totalVotes === "number" ? post.totalVotes : 0,
+            userVote: post.userVote !== undefined ? post.userVote : null,
+          };
+        });
 
         setPosts(transformedPosts);
         // Extract unique tags from posts
@@ -108,15 +132,40 @@ const CommunityPage = () => {
   }, []);
 
   // Handle creating a new post
-  const handleCreatePost = async (postData: FormData) => {
+  const handleCreatePost = async (postData: any) => {
     try {
       const response = await fetch("/api/posts", {
         method: "POST",
-        body: postData,
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(postData),
       });
-      if (!response.ok) throw new Error("Failed to create post");
+
+      if (!response.ok) {
+        throw new Error("Failed to create post");
+      }
+
       const newPost = await response.json();
-      setPosts([newPost, ...posts]);
+
+      // Transform the new post to match Post interface
+      const transformedPost: Post = {
+        _id: newPost._id,
+        title: newPost.title || "",
+        description: newPost.description || "",
+        image: newPost.image || "",
+        author: newPost.author || "Anonymous",
+        timestamp: newPost.timestamp || new Date().toISOString(),
+        likes: newPost.likes || 0,
+        comments: Array.isArray(newPost.comments) ? newPost.comments : [],
+        tags: Array.isArray(newPost.tags) ? newPost.tags : [],
+        postType: newPost.postType || "text",
+        pollOptions: newPost.pollOptions || [],
+        totalVotes: newPost.totalVotes || 0,
+        userVote: newPost.userVote !== undefined ? newPost.userVote : null,
+      };
+
+      setPosts((prevPosts) => [transformedPost, ...prevPosts]);
       setIsModalOpen(false);
     } catch (error) {
       console.error("Error creating post:", error);
@@ -161,7 +210,7 @@ const CommunityPage = () => {
       // Update the posts state
       setPosts(
         posts.map((post) =>
-          post.id === postId ? { ...post, likes: post.likes + 1 } : post
+          post._id === postId ? { ...post, likes: post.likes + 1 } : post
         )
       );
     } catch (error) {
@@ -197,7 +246,7 @@ const CommunityPage = () => {
       // Update the posts state
       setPosts(
         posts.map((post) =>
-          post.id === postId
+          post._id === postId
             ? { ...post, comments: [...post.comments, newComment] }
             : post
         )
@@ -241,17 +290,17 @@ const CommunityPage = () => {
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.5, delay: 0.2 }}
-          className="bg-white rounded-xl shadow-lg p-6 mb-8"
+          className="bg-white rounded-xl shadow-lg p-6 mb-8 max-w-4xl mx-auto"
         >
           <div className="flex flex-col md:flex-row gap-4 items-center justify-between">
-            <div className="relative flex-1">
+            <div className="relative flex-1 max-w-md">
               <FaSearch className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" />
               <input
                 type="text"
                 placeholder="Search posts..."
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
-                className="w-full pl-10 pr-4 py-2 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent"
+                className="w-full pl-10 pr-4 py-2 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent text-black"
               />
             </div>
 
@@ -261,10 +310,14 @@ const CommunityPage = () => {
                 onChange={(e) =>
                   setSortBy(e.target.value as "latest" | "popular")
                 }
-                className="px-4 py-2 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent"
+                className="px-4 py-2 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent bg-white text-gray-800 font-medium"
               >
-                <option value="latest">Latest</option>
-                <option value="popular">Most Popular</option>
+                <option value="latest" className="text-gray-800">
+                  Latest
+                </option>
+                <option value="popular" className="text-gray-800">
+                  Most Popular
+                </option>
               </select>
 
               <motion.button
@@ -319,7 +372,7 @@ const CommunityPage = () => {
           >
             {sortedPosts.map((post, index) => (
               <motion.div
-                key={post.id}
+                key={post._id}
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.5, delay: index * 0.1 }}
