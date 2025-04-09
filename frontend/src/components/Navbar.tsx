@@ -76,7 +76,7 @@ const Navbar = () => {
               <Link
                 key={link.name}
                 href={link.href}
-                className={`flex items-center gap-2 text-base text-lg transition-all duration-300
+                className={`flex items-center gap-2 text-base md:text-lg transition-all duration-300
                   ${
                     pathname === link.href
                       ? scrolled || isCommunityPage
