@@ -1,6 +1,6 @@
 // Set default values on installation
 chrome.runtime.onInstalled.addListener(() => {
-  console.log("R3Vision Extension Installed ✅");
+  console.log("3RVision Extension Installed ✅");
   
   const defaultKeywords = [
     "eco-friendly",
@@ -41,7 +41,10 @@ chrome.tabs.onUpdated.addListener((tabId, changeInfo, tab) => {
   if (changeInfo.status === 'complete' && tab.url) {
     // Check if the URL is an e-commerce site
     const ecommercePatterns = [
-      'amazon', 
+      'amazon',
+      'myntra',
+      'jiomart',
+      'flipkart',
       'ebay',
       'walmart',
       'etsy',

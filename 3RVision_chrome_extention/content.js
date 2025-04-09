@@ -1,5 +1,5 @@
 // Content script loaded message
-console.log("R3Vision content script loaded");
+console.log("3RVision content script loaded");
 
 // Eco-friendly search terms to append
 const ecoSearchTerms = [
@@ -109,46 +109,83 @@ const materialConfig = {
 
 // Function to extract material information from product text
 function extractMaterialInfo(text) {
+  console.log("Extracting materials from text:", text.substring(0, 200)); // Log first 200 chars
   const materialInfo = {
     materials: [],
     percentages: []
   };
 
+  // Normalize text: lowercase, remove extra spaces
+  const normalizedText = text.toLowerCase().replace(/\s+/g, ' ');
+
   // Common patterns for material information
   const patterns = [
-    // Pattern for "100% cotton" or "80% recycled polyester"
-    /(\d+)%\s*([a-zA-Z\s]+)/g,
-    // Pattern for "made of cotton" or "contains recycled polyester"
-    /(?:made of|contains|composed of|constructed from|material:)\s*([a-zA-Z\s]+)/gi,
-    // Pattern for "cotton blend" or "polyester blend"
-    /([a-zA-Z\s]+)\s*blend/gi,
-    // Pattern for "organic cotton" or "recycled polyester"
-    /(organic|recycled)\s+([a-zA-Z\s]+)/gi
+    // Pattern for "100% cotton", "80% recycled polyester"
+    /(\d{1,3})\s*%\s*([a-zA-Z][a-zA-Z\s-]*[a-zA-Z])/g,
+    // Pattern for "material: stainless steel", "made of bamboo"
+    /(?:material|made of|contains|composed of|constructed from|fabric):\s*([a-zA-Z][a-zA-Z\s-]*[a-zA-Z])/gi,
+    // Pattern for "cotton blend", "polyester blend"
+    /([a-zA-Z][a-zA-Z\s-]*[a-zA-Z])\s*blend/gi,
+    // Pattern for "organic cotton", "recycled polyester"
+    /(organic|recycled|stainless|food-grade|grade)\s+([a-zA-Z][a-zA-Z\s-]*[a-zA-Z])/gi,
+    // Pattern to find standalone materials mentioned (like "steel", "wood")
+    /(?:\b)(stainless steel|steel|aluminum|copper|brass|wood|bamboo|ceramic|glass|silicone|plastic|cotton|polyester|nylon|wool|silk)(?:\b)/gi
   ];
 
-  // Extract materials and percentages using patterns
-  patterns.forEach(pattern => {
+  // Keep track of found materials to avoid duplicates
+  const foundMaterials = new Set();
+
+  patterns.forEach((pattern, patternIndex) => {
     let match;
-    while ((match = pattern.exec(text)) !== null) {
-      if (pattern === patterns[0]) {
-        // Handle percentage pattern
-        const percentage = parseInt(match[1]);
-        const material = match[2].trim().toLowerCase();
-        if (!materialInfo.materials.includes(material)) {
-          materialInfo.materials.push(material);
-          materialInfo.percentages.push(percentage);
-        }
-      } else {
-        // Handle other patterns
-        const material = match[1].trim().toLowerCase();
-        if (!materialInfo.materials.includes(material)) {
-          materialInfo.materials.push(material);
-          materialInfo.percentages.push(100); // Default to 100% if percentage not specified
-        }
+    while ((match = pattern.exec(normalizedText)) !== null) {
+      let material = '';
+      let percentage = 100; // Default percentage
+
+      if (patternIndex === 0) { // Percentage pattern
+        percentage = parseInt(match[1]);
+        material = match[2].trim();
+      } else if (patternIndex === 1 || patternIndex === 2) { // Material keyword patterns
+        material = match[1].trim();
+      } else if (patternIndex === 3) { // Modifier + material pattern
+         material = (match[1] + ' ' + match[2]).trim(); // e.g., "organic cotton", "stainless steel"
+      } else if (patternIndex === 4) { // Standalone material pattern
+        material = match[1].trim();
+      }
+
+      // Standardize common variations (e.g., steel -> stainless steel if context available)
+      if (material === 'steel' && normalizedText.includes('stainless')) {
+          material = 'stainless steel';
+      }
+      
+      if (material && !foundMaterials.has(material)) {
+         // Check if this material is known
+         const isKnownMaterial = Object.keys(materialConfig.ecoFriendlyMaterials).some(m => material.includes(m)) ||
+                               Object.keys(materialConfig.nonEcoFriendlyMaterials).some(m => material.includes(m));
+
+         if (isKnownMaterial) {
+             console.log(`Found material: ${material}, Percentage: ${percentage}`);
+             materialInfo.materials.push(material);
+             materialInfo.percentages.push(percentage);
+             foundMaterials.add(material);
+         }
       }
     }
   });
+  
+  // If no materials found via patterns, check common single words from config
+  if (materialInfo.materials.length === 0) {
+      const allKnownMaterials = [...Object.keys(materialConfig.ecoFriendlyMaterials), ...Object.keys(materialConfig.nonEcoFriendlyMaterials)];
+      allKnownMaterials.forEach(knownMaterial => {
+          if (normalizedText.includes(knownMaterial) && !foundMaterials.has(knownMaterial)) {
+              console.log(`Found fallback material: ${knownMaterial}`);
+              materialInfo.materials.push(knownMaterial);
+              materialInfo.percentages.push(100); // Default percentage
+              foundMaterials.add(knownMaterial);
+          }
+      });
+  }
 
+  console.log("Extracted Material Info:", materialInfo);
   return materialInfo;
 }
 
@@ -312,92 +349,6 @@ function createMaterialInfoDisplay(materialInfo, ecoScore) {
   return display;
 }
 
-// Function to modify the search query
-function modifySearchQuery() {
-  // Get the current search input
-  const searchInput = document.querySelector('#twotabsearchtextbox, #nav-search-bar-form input[type="text"]');
-  if (!searchInput) return;
-
-  // Get the current search query
-  const currentQuery = searchInput.value.trim();
-  if (!currentQuery) return;
-
-  // Check if the query already contains eco-friendly terms
-  const hasEcoTerm = ecoSearchTerms.some(term => 
-    currentQuery.toLowerCase().includes(term.toLowerCase())
-  );
-
-  if (!hasEcoTerm) {
-    // Add a random eco-friendly term to the search
-    const randomEcoTerm = ecoSearchTerms[Math.floor(Math.random() * ecoSearchTerms.length)];
-    const newQuery = `${currentQuery} ${randomEcoTerm}`;
-    
-    // Update the search input
-    searchInput.value = newQuery;
-    
-    // Trigger the search form submission
-    const searchForm = document.querySelector('#nav-search-bar-form, form[action*="search"]');
-    if (searchForm) {
-      searchForm.submit();
-    }
-  }
-}
-
-// Listen for messages from the extension
-chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
-  console.log("Message received:", request);
-  if (request.action === 'toggleFilter') {
-    if (request.enabled) {
-      console.log("Filtering enabled, applying filters...");
-      // Modify the search query when filter is enabled
-      modifySearchQuery();
-      filterProducts();
-    } else {
-      console.log("Filtering disabled, showing all products...");
-      showAllProducts();
-    }
-  } else if (request.action === 'updateKeywords') {
-    chrome.storage.local.get(['enabled'], function(result) {
-      if (result.enabled) {
-        filterProducts();
-      }
-    });
-  }
-});
-
-// just check if the content script is loaded
-// Function to get keywords from storage
-async function getKeywords() {
-  return new Promise((resolve) => {
-    chrome.storage.local.get(['keywords'], function(result) {
-      const keywords = result.keywords ? result.keywords.split('\n') : [];
-      console.log("Retrieved keywords:", keywords);
-      resolve(keywords.map(k => k.trim().toLowerCase()).filter(k => k));
-    });
-  });
-}
-
-// Function to show all products
-function showAllProducts() {
-  const selectors = {
-    'amazon': '[data-component-type="s-search-result"], .s-result-item, div[data-asin]:not([data-asin=""]), .sg-col-4-of-12',
-    'walmart.com': '[data-item-id]',
-    'ebay.com': '.s-item',
-    'etsy.com': '.v2-listing-card',
-    'target.com': '[data-test="product-card"]'
-  };
-
-  const currentSite = Object.keys(selectors).find(site => window.location.hostname.includes(site));
-  if (!currentSite) return;
-
-  const products = document.querySelectorAll(selectors[currentSite]);
-  console.log(`Showing all ${products.length} products`);
-  products.forEach(product => {
-    product.style.display = '';
-    product.style.opacity = '1';
-  });
-}
-
 // Function to check if a product is recyclable or biodegradable
 function isRecyclableOrBiodegradable(materialInfo) {
   for (const material of materialInfo.materials) {
@@ -411,40 +362,105 @@ function isRecyclableOrBiodegradable(materialInfo) {
   return false;
 }
 
+// Function to show all products (ensure displays are removed)
+function showAllProducts() {
+  console.log("--- Running showAllProducts --- ");
+  const selectors = {
+    'amazon': '[data-component-type="s-search-result"], .s-result-item, div[data-asin]:not([data-asin=""])',
+    'myntra': '.product-base',
+    'jiomart': '.product-list',
+    'flipkart': '._1AtVbE',
+    'walmart.com': '[data-item-id]',
+    'ebay.com': '.s-item',
+    'etsy.com': '.v2-listing-card',
+    'target.com': '[data-test="product-card"]'
+  };
+
+  const currentSite = Object.keys(selectors).find(site => window.location.hostname.includes(site));
+  if (!currentSite) return;
+
+  const products = document.querySelectorAll(selectors[currentSite]);
+  console.log(`Showing all ${products.length} potential products`);
+  products.forEach(product => {
+    product.style.display = '';
+    product.style.opacity = '1';
+    // Remove our display element if it exists
+    const existingDisplay = product.querySelector('.r3vision-material-display');
+    if (existingDisplay) existingDisplay.remove();
+  });
+
+  // Remove the "no products found" message if it exists
+  const existingMessage = document.getElementById('r3vision-no-products-message');
+  if (existingMessage) existingMessage.remove();
+  console.log("--- showAllProducts Finished --- ");
+}
+
 // Function to filter products
 function filterProducts() {
-  const products = document.querySelectorAll('[data-component-type="s-search-result"]');
+  console.log("--- Running filterProducts --- ");
+  const selectors = {
+    'amazon': '[data-component-type="s-search-result"], .s-result-item, div[data-asin]:not([data-asin=""])',
+    'myntra': '.product-base',
+    'jiomart': '.product-list',
+    'flipkart': '._1AtVbE',
+    'walmart.com': '[data-item-id]',
+    'ebay.com': '.s-item',
+    'etsy.com': '.v2-listing-card',
+    'target.com': '[data-test="product-card"]'
+  };
+
+  const currentSite = Object.keys(selectors).find(site => window.location.hostname.includes(site));
+  if (!currentSite) {
+    console.log("No matching site found for filtering.");
+    return;
+  }
+
+  const potentialProductNodes = document.querySelectorAll(selectors[currentSite]);
+  console.log(`Found ${potentialProductNodes.length} potential product nodes on ${currentSite}.`);
   let foundRecyclable = false;
+  let productsProcessed = 0;
 
-  products.forEach((product, index) => {
-    // Extract product details from different sections
-    const titleElement = product.querySelector('h2 a');
-    const title = titleElement ? titleElement.textContent.toLowerCase() : '';
+  potentialProductNodes.forEach((product, index) => {
+    // Basic check if it looks like a product result
+    if (!product.querySelector('h2 a span') && !product.querySelector('.a-price')) {
+        console.log(`Node ${index} skipped - doesn't seem like a product.`);
+        return; // Skip nodes that don't look like products
+    }
+    productsProcessed++;
+    console.log(`Processing product ${index + 1} on ${currentSite}...`);
+
+    // --- Enhanced Text Extraction --- 
+    let combinedText = '';
     
-    // Get description from product details section
-    const descriptionElement = product.querySelector('[data-feature-name="productDescription"]');
-    const description = descriptionElement ? descriptionElement.textContent.toLowerCase() : '';
-    
-    // Get additional details
-    const detailsElement = product.querySelector('[data-feature-name="productDetails"]');
-    const details = detailsElement ? detailsElement.textContent.toLowerCase() : '';
-    
-    // Get bullet points
+    // Get text from common areas, checking if they exist
+    const titleElement = product.querySelector('h2 a span');
+    if (titleElement) combinedText += titleElement.textContent + ' ';
+
+    const descriptionElements = product.querySelectorAll('.a-section .a-size-base, .a-section .a-text-normal');
+    descriptionElements.forEach(el => combinedText += el.textContent + ' ');
+
     const bulletPoints = product.querySelectorAll('.a-list-item');
-    let bulletPointsText = '';
-    bulletPoints.forEach(bullet => {
-      bulletPointsText += ' ' + bullet.textContent.toLowerCase();
-    });
+    bulletPoints.forEach(bullet => combinedText += bullet.textContent + ' ');
 
-    // Combine all text for material analysis
-    const combinedText = title + ' ' + description + ' ' + details + ' ' + bulletPointsText;
+    // Fallback: Get all text within the product container if specific parts fail
+    if (combinedText.trim().length < 50) { // If very little text found, try broader extraction
+        console.log(`Product ${index + 1}: Using fallback text extraction.`);
+        combinedText = product.textContent || ''; 
+    }
+    // --- End Enhanced Text Extraction ---
     
     // Extract material information
     const materialInfo = extractMaterialInfo(combinedText);
     
     // Check if product is recyclable or biodegradable
     const isRecyclable = isRecyclableOrBiodegradable(materialInfo);
+    console.log(`Product ${index + 1} isRecyclableOrBiodegradable: ${isRecyclable}`);
     
+    // --- Apply Filter --- 
+    // First, remove any existing display from previous runs
+    const existingDisplay = product.querySelector('.r3vision-material-display');
+    if (existingDisplay) existingDisplay.remove();
+
     if (isRecyclable) {
       product.style.display = '';
       product.style.opacity = '1';
@@ -453,40 +469,62 @@ function filterProducts() {
       // Calculate and display eco-score
       const ecoScore = calculateEcoScore(materialInfo);
       const display = createMaterialInfoDisplay(materialInfo, ecoScore);
-      product.style.position = 'relative';
+      display.classList.add('r3vision-material-display'); // Add class for easy removal
+      product.style.position = 'relative'; // Ensure positioning context
       product.appendChild(display);
     } else {
       product.style.display = 'none';
       product.style.opacity = '0';
     }
   });
+  console.log(`Processed ${productsProcessed} products on ${currentSite}.`);
 
-  // Show message if no recyclable products found
-  if (!foundRecyclable) {
+  // --- Update Message --- 
+  // Remove previous message first
+  const existingMessage = document.getElementById('r3vision-no-products-message');
+  if (existingMessage) existingMessage.remove();
+
+  // Show message only if products were processed but none were recyclable
+  if (productsProcessed > 0 && !foundRecyclable) {
+    console.log("No recyclable/biodegradable products found after processing.");
     const message = document.createElement('div');
+    message.id = 'r3vision-no-products-message'; // Add ID for easy removal
     message.style.cssText = `
       text-align: center;
       padding: 20px;
       background-color: #f8f9fa;
       border: 1px solid #dee2e6;
       border-radius: 4px;
-      margin: 20px 0;
+      margin: 20px auto; /* Center the message */
       color: #6c757d;
+      max-width: 80%;
     `;
-    message.textContent = 'No recyclable or biodegradable products found in this search. Try different search terms or check back later.';
+    message.textContent = '3RVision: No recyclable or biodegradable products found in this search. Try different search terms or check back later.';
     
-    const resultsContainer = document.querySelector('[data-component-type="s-search-results"]');
-    if (resultsContainer) {
-      resultsContainer.insertBefore(message, resultsContainer.firstChild);
+    // Try to insert before the main results container
+    const resultsContainer = document.querySelector('#search, [data-component-type="s-search-results"], .s-main-slot') || document.body;
+    resultsContainer.insertBefore(message, resultsContainer.firstChild);
+  } else if (productsProcessed === 0) {
+      console.log("No product elements found to process.");
+  }
+  console.log("--- filterProducts Finished --- ");
+}
+
+// Listen for messages from the extension
+chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
+  if (request.action === 'toggleFilter') {
+    if (request.enabled) {
+      filterProducts();
+    } else {
+      showAllProducts();
     }
   }
-}
+});
 
 // Initial check when page loads
 if (document.readyState === 'complete') {
   chrome.storage.local.get(['enabled'], function(result) {
     if (result.enabled) {
-      console.log("Page already loaded, checking if filtering is enabled");
       filterProducts();
     }
   });
@@ -494,35 +532,26 @@ if (document.readyState === 'complete') {
   window.addEventListener('load', () => {
     chrome.storage.local.get(['enabled'], function(result) {
       if (result.enabled) {
-        console.log("Page loaded, checking if filtering is enabled");
         filterProducts();
       }
     });
   });
 }
 
-// Monitor for dynamic content changes (like infinite scroll or lazy loading)
+// Monitor for dynamic content changes
 const observer = new MutationObserver((mutations) => {
   chrome.storage.local.get(['enabled'], function(result) {
     if (result.enabled) {
-      // Check if new products were added
       const hasNewProducts = mutations.some(mutation => 
         Array.from(mutation.addedNodes).some(node => 
           node.nodeType === 1 && (
             node.matches('[data-component-type="s-search-result"]') ||
-            node.matches('.s-result-item') ||
-            node.matches('div[data-asin]') ||
-            node.matches('.sg-col-4-of-12') ||
-            node.querySelector('[data-component-type="s-search-result"]') ||
-            node.querySelector('.s-result-item') ||
-            node.querySelector('div[data-asin]') ||
-            node.querySelector('.sg-col-4-of-12')
+            node.querySelector('[data-component-type="s-search-result"]')
           )
         )
       );
 
       if (hasNewProducts) {
-        console.log("New products detected, reapplying filter");
         filterProducts();
       }
     }
