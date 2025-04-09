@@ -1,11 +1,22 @@
 "use client";
 
+import { useState } from "react";
 import { motion } from "framer-motion";
 import { FaUsers, FaLightbulb, FaHandshake, FaComments } from "react-icons/fa";
 import { useRouter } from "next/navigation";
+import { useAuth } from "@/context/AuthContext";
+import UnauthorizedDialog from "./UnauthorizedDialog";
+import LoginModal from "./LoginModal";
+import SignupModal from "./SignupModal";
 
 const CommunitySection = () => {
   const router = useRouter();
+  const { user } = useAuth();
+
+  // Add state for managing modals
+  const [showUnauthorizedDialog, setShowUnauthorizedDialog] = useState(false);
+  const [showLoginModal, setShowLoginModal] = useState(false);
+  const [showSignupModal, setShowSignupModal] = useState(false);
 
   const features = [
     {
@@ -34,8 +45,15 @@ const CommunitySection = () => {
     },
   ];
 
+  // Updated to check if user is logged in
   const handleJoinNow = () => {
-    router.push("/community");
+    if (user) {
+      // User is logged in, navigate to community page
+      router.push("/community");
+    } else {
+      // User is not logged in, show unauthorized dialog
+      setShowUnauthorizedDialog(true);
+    }
   };
 
   return (
@@ -93,6 +111,39 @@ const CommunitySection = () => {
           </button>
         </motion.div>
       </div>
+
+      {/* Auth Modals */}
+      <LoginModal
+        isOpen={showLoginModal}
+        onClose={() => setShowLoginModal(false)}
+        onSwitchToSignup={() => {
+          setShowLoginModal(false);
+          setShowSignupModal(true);
+        }}
+      />
+
+      <SignupModal
+        isOpen={showSignupModal}
+        onClose={() => setShowSignupModal(false)}
+        onSwitchToLogin={() => {
+          setShowSignupModal(false);
+          setShowLoginModal(true);
+        }}
+      />
+
+      {/* Unauthorized Access Dialog */}
+      <UnauthorizedDialog
+        isOpen={showUnauthorizedDialog}
+        onClose={() => setShowUnauthorizedDialog(false)}
+        onLogin={() => {
+          setShowUnauthorizedDialog(false);
+          setShowLoginModal(true);
+        }}
+        onSignup={() => {
+          setShowUnauthorizedDialog(false);
+          setShowSignupModal(true);
+        }}
+      />
     </section>
   );
 };

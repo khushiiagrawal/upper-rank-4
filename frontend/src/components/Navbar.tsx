@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from "react";
 import Link from "next/link";
-import { usePathname } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
 import { motion } from "framer-motion";
 import {
   FaBars,
@@ -18,13 +18,16 @@ import {
 import { useAuth } from "@/context/AuthContext";
 import LoginModal from "./LoginModal";
 import SignupModal from "./SignupModal";
+import UnauthorizedDialog from "./UnauthorizedDialog";
 
 const Navbar = () => {
   const [isOpen, setIsOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
   const [showLoginModal, setShowLoginModal] = useState(false);
   const [showSignupModal, setShowSignupModal] = useState(false);
+  const [showUnauthorizedDialog, setShowUnauthorizedDialog] = useState(false);
   const pathname = usePathname();
+  const router = useRouter();
   const isCommunityPage = pathname === "/community";
   const { user, logout, loading } = useAuth();
 
@@ -50,7 +53,7 @@ const Navbar = () => {
       href: "/#how-to-use",
       icon: <FaQuestionCircle />,
     },
-    { name: "Community", href: "/#community", icon: <FaUsers /> },
+    { name: "Community", href: "/#community", icon: <FaUsers /> }, // Changed from /community to /#community
     { name: "Contact", href: "/#contact", icon: <FaEnvelope /> },
   ];
 
@@ -68,11 +71,13 @@ const Navbar = () => {
   const handleOpenLogin = () => {
     setShowLoginModal(true);
     setShowSignupModal(false);
+    setShowUnauthorizedDialog(false);
   };
 
   const handleOpenSignup = () => {
     setShowSignupModal(true);
     setShowLoginModal(false);
+    setShowUnauthorizedDialog(false);
   };
 
   const handleLogout = async () => {
@@ -348,6 +353,20 @@ const Navbar = () => {
         onSwitchToLogin={() => {
           setShowSignupModal(false);
           setShowLoginModal(true);
+        }}
+      />
+
+      {/* Unauthorized Access Dialog */}
+      <UnauthorizedDialog
+        isOpen={showUnauthorizedDialog}
+        onClose={() => setShowUnauthorizedDialog(false)}
+        onLogin={() => {
+          setShowUnauthorizedDialog(false);
+          setShowLoginModal(true);
+        }}
+        onSignup={() => {
+          setShowUnauthorizedDialog(false);
+          setShowSignupModal(true);
         }}
       />
     </>
