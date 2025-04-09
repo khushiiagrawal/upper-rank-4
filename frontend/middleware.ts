@@ -6,6 +6,7 @@ import { verifyToken } from '@/lib/jwt';
 const protectedRoutes = [
   '/dashboard',
   '/profile',
+  '/community',  // Add this line to protect the community page
   '/community/create',
 ];
 
