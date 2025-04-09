@@ -93,10 +93,10 @@ const Navbar = () => {
         className={`fixed w-full z-50 transition-all duration-300 
           ${
             scrolled
-              ? "bg-green-50 backdrop-blur-md shadow-md"
+              ? "bg-green-100 backdrop-blur-md shadow-md"
               : "bg-transparent"
           } 
-          ${isCommunityPage ? "bg-green-50 backdrop-blur-md shadow-md" : ""}`}
+          ${isCommunityPage ? "bg-green-100 backdrop-blur-md shadow-md" : ""}`}
       >
         <div className="max-w-8xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex justify-between items-center h-16">
