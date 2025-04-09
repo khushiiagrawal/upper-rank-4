@@ -8,38 +8,44 @@ async function connectToDatabase() {
     throw new Error("MONGODB_URI is not defined");
   }
   const client = await MongoClient.connect(uri);
-  const db = client.db("upper-rank");
+  const db = client.db("3rvision");
   return { client, db };
+}
+
+// Define an interface for the Post document
+interface Post {
+  _id: ObjectId;
+  likes: number;
+  // Add other post fields as needed
 }
 
 export async function POST(
   request: Request,
-  { params }: { params: { id: string } }
+  context: { params: { id: string } }
 ) {
   try {
-    const { id } = params;
+    const { id } = context.params;
     const { client, db } = await connectToDatabase();
 
-    // Update the post's likes count
-    const result = await db.collection("posts").findOneAndUpdate(
+    const result = await db.collection<Post>("posts").findOneAndUpdate(
       { _id: new ObjectId(id) },
       { $inc: { likes: 1 } },
       { returnDocument: "after" }
     );
 
-    if (!result) {
+    if (!result.value) {
+      await client.close();
       return NextResponse.json(
         { error: "Post not found" },
         { status: 404 }
       );
     }
 
-    // Close the database connection
     await client.close();
 
     return NextResponse.json({
-      _id: result._id.toString(),
-      likes: result.likes,
+      _id: result.value._id.toString(),
+      likes: result.value.likes,
     });
   } catch (error) {
     console.error("Error liking post:", error);
@@ -48,4 +54,4 @@ export async function POST(
       { status: 500 }
     );
   }
-} 
+}
