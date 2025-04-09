@@ -1,7 +1,13 @@
 "use client";
 
 import { motion } from "framer-motion";
-import { FaEnvelope, FaPhone, FaMapMarkerAlt } from "react-icons/fa";
+import {
+  FaEnvelope,
+  FaPhone,
+  FaMapMarkerAlt,
+  FaCheckCircle,
+  FaExclamationCircle,
+} from "react-icons/fa";
 import { useState } from "react";
 
 const ContactSection = () => {
@@ -12,6 +18,13 @@ const ContactSection = () => {
     message: "",
   });
 
+  const [status, setStatus] = useState({
+    loading: false,
+    success: false,
+    error: false,
+    message: "",
+  });
+
   const handleChange = (
     e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
   ) => {
@@ -19,10 +32,58 @@ const ContactSection = () => {
     setFormData((prev) => ({ ...prev, [name]: value }));
   };
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    // Handle form submission logic here
-    console.log("Form submitted:", formData);
+
+    try {
+      setStatus({ loading: true, success: false, error: false, message: "" });
+
+      const response = await fetch("/api/contact", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(formData),
+      });
+
+      const data = await response.json();
+
+      if (!response.ok) {
+        throw new Error(data.error || "Failed to send message");
+      }
+
+      // Success! Clear the form
+      setFormData({
+        name: "",
+        email: "",
+        subject: "",
+        message: "",
+      });
+
+      setStatus({
+        loading: false,
+        success: true,
+        error: false,
+        message:
+          "Your message has been sent successfully! We'll get back to you soon.",
+      });
+
+      // Reset success message after 5 seconds
+      setTimeout(() => {
+        setStatus((prev) => ({ ...prev, success: false, message: "" }));
+      }, 5000);
+    } catch (error) {
+      console.error("Contact form error:", error);
+      setStatus({
+        loading: false,
+        success: false,
+        error: true,
+        message:
+          error instanceof Error
+            ? error.message
+            : "Something went wrong. Please try again.",
+      });
+    }
   };
 
   const fadeInUp = {
@@ -93,6 +154,22 @@ const ContactSection = () => {
             <h3 className="text-2xl font-semibold text-gray-800 mb-6">
               Send us a message
             </h3>
+
+            {/* Status messages */}
+            {status.success && (
+              <div className="mb-6 p-4 bg-green-100 text-green-700 rounded-md flex items-center">
+                <FaCheckCircle className="mr-2" />
+                {status.message}
+              </div>
+            )}
+
+            {status.error && (
+              <div className="mb-6 p-4 bg-red-100 text-red-700 rounded-md flex items-center">
+                <FaExclamationCircle className="mr-2" />
+                {status.message}
+              </div>
+            )}
+
             <form onSubmit={handleSubmit} className="space-y-6">
               <div>
                 <label
@@ -107,8 +184,9 @@ const ContactSection = () => {
                   name="name"
                   value={formData.name}
                   onChange={handleChange}
-                  className="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500"
+                  className="w-full px-4 py-2 border text-black border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500"
                   required
+                  disabled={status.loading}
                 />
               </div>
 
@@ -125,8 +203,9 @@ const ContactSection = () => {
                   name="email"
                   value={formData.email}
                   onChange={handleChange}
-                  className="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500"
+                  className="w-full px-4 py-2 border text-black border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500"
                   required
+                  disabled={status.loading}
                 />
               </div>
 
@@ -143,8 +222,9 @@ const ContactSection = () => {
                   name="subject"
                   value={formData.subject}
                   onChange={handleChange}
-                  className="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500"
+                  className="w-full px-4 py-2 border text-black border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500"
                   required
+                  disabled={status.loading}
                 />
               </div>
 
@@ -161,8 +241,9 @@ const ContactSection = () => {
                   value={formData.message}
                   onChange={handleChange}
                   rows={4}
-                  className="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500"
+                  className="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500 text-black "
                   required
+                  disabled={status.loading}
                 ></textarea>
               </div>
 
@@ -170,13 +251,43 @@ const ContactSection = () => {
                 type="submit"
                 whileHover={{ scale: 1.02 }}
                 whileTap={{ scale: 0.98 }}
-                className="btn-primary w-full"
+                className={`btn-primary w-full flex items-center justify-center ${
+                  status.loading ? "opacity-70 cursor-not-allowed" : ""
+                }`}
+                disabled={status.loading}
               >
-                Send Message
+                {status.loading ? (
+                  <>
+                    <svg
+                      className="animate-spin -ml-1 mr-3 h-5 w-5 text-white"
+                      xmlns="http://www.w3.org/2000/svg"
+                      fill="none"
+                      viewBox="0 0 24 24"
+                    >
+                      <circle
+                        className="opacity-25"
+                        cx="12"
+                        cy="12"
+                        r="10"
+                        stroke="currentColor"
+                        strokeWidth="4"
+                      ></circle>
+                      <path
+                        className="opacity-75"
+                        fill="currentColor"
+                        d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
+                      ></path>
+                    </svg>
+                    Sending...
+                  </>
+                ) : (
+                  "Send Message"
+                )}
               </motion.button>
             </form>
           </motion.div>
 
+          {/* Rest of the component remains unchanged */}
           {/* Contact Information */}
           <motion.div
             initial="hidden"
@@ -218,6 +329,7 @@ const ContactSection = () => {
               </motion.a>
             ))}
 
+            {/* Social media section remains unchanged */}
             <motion.div
               className="mt-8 p-6 bg-green-50 rounded-lg"
               whileHover={{ y: -5 }}
@@ -231,7 +343,7 @@ const ContactSection = () => {
                 waste management.
               </p>
               <div className="flex space-x-4">
-                {/* Social media icons would go here */}
+                {/* Social media icons */}
                 <motion.div
                   className="w-10 h-10 bg-green-600 rounded-full flex items-center justify-center text-white"
                   whileHover={{ scale: 1.1, rotate: 10 }}
