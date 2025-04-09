@@ -524,6 +524,10 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
 // Initial check when page loads
 if (document.readyState === 'complete') {
   chrome.storage.local.get(['enabled'], function(result) {
+    if (chrome.runtime.lastError) {
+      console.error("Error accessing storage:", chrome.runtime.lastError);
+      return;
+    }
     if (result.enabled) {
       filterProducts();
     }
@@ -531,6 +535,10 @@ if (document.readyState === 'complete') {
 } else {
   window.addEventListener('load', () => {
     chrome.storage.local.get(['enabled'], function(result) {
+      if (chrome.runtime.lastError) {
+        console.error("Error accessing storage:", chrome.runtime.lastError);
+        return;
+      }
       if (result.enabled) {
         filterProducts();
       }
@@ -539,26 +547,63 @@ if (document.readyState === 'complete') {
 }
 
 // Monitor for dynamic content changes
-const observer = new MutationObserver((mutations) => {
-  chrome.storage.local.get(['enabled'], function(result) {
-    if (result.enabled) {
-      const hasNewProducts = mutations.some(mutation => 
-        Array.from(mutation.addedNodes).some(node => 
-          node.nodeType === 1 && (
-            node.matches('[data-component-type="s-search-result"]') ||
-            node.querySelector('[data-component-type="s-search-result"]')
+if (document.readyState === 'complete') {
+  const observer = new MutationObserver((mutations) => {
+    chrome.storage.local.get(['enabled'], function(result) {
+      if (result.enabled) {
+        const hasNewProducts = mutations.some(mutation => 
+          Array.from(mutation.addedNodes).some(node => 
+            node.nodeType === 1 && (
+              node.matches('[data-component-type="s-search-result"]') ||
+              node.querySelector('[data-component-type="s-search-result"]')
+            )
           )
-        )
-      );
+        );
 
-      if (hasNewProducts) {
-        filterProducts();
+        if (hasNewProducts) {
+          try {
+            filterProducts();
+          } catch (error) {
+            console.error("Error during filtering:", error);
+          }
+        }
       }
-    }
+    });
   });
-});
 
-observer.observe(document.body, {
-  childList: true,
-  subtree: true
-});
+  observer.observe(document.body, {
+    childList: true,
+    subtree: true
+  });
+} else {
+  window.addEventListener('load', () => {
+    // Re-run the observer setup after the page is fully loaded
+    const observer = new MutationObserver((mutations) => {
+      chrome.storage.local.get(['enabled'], function(result) {
+        if (result.enabled) {
+          const hasNewProducts = mutations.some(mutation => 
+            Array.from(mutation.addedNodes).some(node => 
+              node.nodeType === 1 && (
+                node.matches('[data-component-type="s-search-result"]') ||
+                node.querySelector('[data-component-type="s-search-result"]')
+              )
+            )
+          );
+
+          if (hasNewProducts) {
+            try {
+              filterProducts();
+            } catch (error) {
+              console.error("Error during filtering:", error);
+            }
+          }
+        }
+      });
+    });
+
+    observer.observe(document.body, {
+      childList: true,
+      subtree: true
+    });
+  });
+}
