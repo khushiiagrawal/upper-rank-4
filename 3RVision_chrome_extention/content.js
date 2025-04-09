@@ -1,12 +1,69 @@
 // Content script loaded message
 console.log("R3Vision content script loaded");
 
+// Eco-friendly search terms to append
+const ecoSearchTerms = [
+  "eco-friendly",
+  "sustainable",
+  "biodegradable",
+  "recyclable",
+  "compostable",
+  "organic",
+  "natural",
+  "renewable",
+  "plastic-free",
+  "zero waste",
+  "recycled",
+  "bio-based",
+  "eco-conscious",
+  "environmentally friendly",
+  "green",
+  "carbon neutral",
+  "eco-certified",
+  "low impact",
+  "energy efficient",
+  "ethically sourced"
+];
+
+// Function to modify the search query
+function modifySearchQuery() {
+  // Get the current search input
+  const searchInput = document.querySelector('#twotabsearchtextbox, #nav-search-bar-form input[type="text"]');
+  if (!searchInput) return;
+
+  // Get the current search query
+  const currentQuery = searchInput.value.trim();
+  if (!currentQuery) return;
+
+  // Check if the query already contains eco-friendly terms
+  const hasEcoTerm = ecoSearchTerms.some(term => 
+    currentQuery.toLowerCase().includes(term.toLowerCase())
+  );
+
+  if (!hasEcoTerm) {
+    // Add a random eco-friendly term to the search
+    const randomEcoTerm = ecoSearchTerms[Math.floor(Math.random() * ecoSearchTerms.length)];
+    const newQuery = `${currentQuery} ${randomEcoTerm}`;
+    
+    // Update the search input
+    searchInput.value = newQuery;
+    
+    // Trigger the search form submission
+    const searchForm = document.querySelector('#nav-search-bar-form, form[action*="search"]');
+    if (searchForm) {
+      searchForm.submit();
+    }
+  }
+}
+
 // Listen for messages from the extension
 chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
   console.log("Message received:", request);
   if (request.action === 'toggleFilter') {
     if (request.enabled) {
       console.log("Filtering enabled, applying filters...");
+      // Modify the search query when filter is enabled
+      modifySearchQuery();
       filterProducts();
     } else {
       console.log("Filtering disabled, showing all products...");
@@ -20,6 +77,7 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
     });
   }
 });
+
 // just check if the content script is loaded
 // Function to get keywords from storage
 async function getKeywords() {
