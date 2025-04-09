@@ -277,7 +277,7 @@ const PostCard = ({ post, onLike, onComment, onVote }: PostCardProps) => {
           onClick={() => setShowComments(!showComments)}
           className="text-gray-500 hover:text-gray-700 flex items-center gap-1"
         >
-          <FaComment className="text-sm" />
+          <FaComment className="text-sm text-black" />
           <span>{comments.length} Comments</span>
         </button>
         <button
