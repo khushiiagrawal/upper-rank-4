@@ -5,7 +5,11 @@ import { Canvas } from "@react-three/fiber";
 import { OrbitControls, PerspectiveCamera } from "@react-three/drei";
 import Earth3D from "./Earth3D";
 import { FaCamera, FaUpload, FaChrome } from "react-icons/fa";
-import { useState, useRef } from "react";
+import { useState, useRef, useEffect } from "react";
+import { useAuth } from "@/context/AuthContext";
+import UnauthorizedDialog from "./UnauthorizedDialog";
+import LoginModal from "./LoginModal";
+import SignupModal from "./SignupModal";
 
 const HeroSection = () => {
   const [showCamera, setShowCamera] = useState(false);
@@ -13,8 +17,56 @@ const HeroSection = () => {
   const [capturedImage, setCapturedImage] = useState<string | null>(null);
   const videoRef = useRef<HTMLVideoElement>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
+  const { user } = useAuth();
+
+  // State for tracking uploads and showing auth modals
+  const [remainingUploads, setRemainingUploads] = useState(3);
+  const [showUnauthorizedDialog, setShowUnauthorizedDialog] = useState(false);
+  const [showLoginModal, setShowLoginModal] = useState(false);
+  const [showSignupModal, setShowSignupModal] = useState(false);
+
+  // Load remaining uploads from localStorage on component mount
+  useEffect(() => {
+    if (!user) {
+      const storedUploads = localStorage.getItem("remainingUploads");
+      if (storedUploads !== null) {
+        setRemainingUploads(parseInt(storedUploads));
+      } else {
+        localStorage.setItem("remainingUploads", "3");
+      }
+    } else {
+      // If user is logged in, ensure they have unlimited uploads
+      localStorage.removeItem("remainingUploads");
+    }
+  }, [user]);
+
+  // Update localStorage when remaining uploads changes
+  useEffect(() => {
+    if (!user && remainingUploads >= 0) {
+      localStorage.setItem("remainingUploads", remainingUploads.toString());
+    }
+  }, [remainingUploads, user]);
+
+  // Check if user can upload
+  const canUpload = () => {
+    if (user) return true; // Logged in users have unlimited uploads
+    return remainingUploads > 0;
+  };
+
+  // Decrement upload count after successful upload/scan
+  const decrementUploads = () => {
+    if (!user && remainingUploads > 0) {
+      setRemainingUploads((prev) => prev - 1);
+    }
+  };
 
   const handleScanImage = async () => {
+    // Check if user can upload
+    if (!canUpload()) {
+      setShowUnauthorizedDialog(true);
+      return;
+    }
+
     try {
       if (showCamera) {
         // If camera is already showing, capture the image
@@ -29,6 +81,8 @@ const HeroSection = () => {
             setCapturedImage(imageData);
             setShowCamera(false);
             stopCamera();
+            // Decrement uploads after successful capture
+            decrementUploads();
             // Here you would typically send the image to your backend for processing
             console.log("Image captured:", imageData);
           }
@@ -60,6 +114,12 @@ const HeroSection = () => {
   };
 
   const handleUploadImage = () => {
+    // Check if user can upload
+    if (!canUpload()) {
+      setShowUnauthorizedDialog(true);
+      return;
+    }
+
     if (fileInputRef.current) {
       fileInputRef.current.click();
     }
@@ -69,24 +129,26 @@ const HeroSection = () => {
     const file = e.target.files?.[0];
     if (file) {
       const formData = new FormData();
-      formData.append('image', file);
+      formData.append("image", file);
 
       try {
-        const response = await fetch('http://localhost:8080/upload', {
-          method: 'POST',
+        const response = await fetch("http://localhost:8080/upload", {
+          method: "POST",
           body: formData,
         });
 
         if (!response.ok) {
-          throw new Error('Upload failed');
+          throw new Error("Upload failed");
         }
 
         const data = await response.json();
         setCapturedImage(data.url);
-        console.log('Image uploaded successfully:', data.url);
+        // Decrement uploads after successful upload
+        decrementUploads();
+        console.log("Image uploaded successfully:", data.url);
       } catch (error) {
-        console.error('Error uploading image:', error);
-        alert('Failed to upload image. Please try again.');
+        console.error("Error uploading image:", error);
+        alert("Failed to upload image. Please try again.");
       }
     }
   };
@@ -211,39 +273,89 @@ const HeroSection = () => {
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.8, delay: 0.4 }}
-          className="flex flex-col md:flex-row gap-4"
+          className="flex flex-col items-center justify-center gap-4"
         >
-          <motion.button
-            whileHover={{ scale: 1.05 }}
-            whileTap={{ scale: 0.95 }}
-            onClick={handleScanImage}
-            className="flex items-center justify-center gap-2 px-6 py-3 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors duration-200 shadow-lg"
-          >
-            <FaCamera className="text-xl" />
-            <span>{showCamera ? "Capture Image" : "Scan Image"}</span>
-          </motion.button>
+          {/* Buttons row */}
+          <div className="flex flex-col md:flex-row gap-4 mb-4">
+            <motion.button
+              whileHover={{ scale: 1.05 }}
+              whileTap={{ scale: 0.95 }}
+              onClick={handleScanImage}
+              className="flex items-center justify-center gap-2 px-6 py-3 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors duration-200 shadow-lg"
+            >
+              <FaCamera className="text-xl" />
+              <span>{showCamera ? "Capture Image" : "Scan Image"}</span>
+            </motion.button>
 
-          <motion.button
-            whileHover={{ scale: 1.05 }}
-            whileTap={{ scale: 0.95 }}
-            onClick={handleUploadImage}
-            className="flex items-center justify-center gap-2 px-6 py-3 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors duration-200 shadow-lg"
-          >
-            <FaUpload className="text-xl" />
-            <span>Upload Image</span>
-          </motion.button>
+            <motion.button
+              whileHover={{ scale: 1.05 }}
+              whileTap={{ scale: 0.95 }}
+              onClick={handleUploadImage}
+              className="flex items-center justify-center gap-2 px-6 py-3 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors duration-200 shadow-lg"
+            >
+              <FaUpload className="text-xl" />
+              <span>Upload Image</span>
+            </motion.button>
 
-          <motion.button
-            whileHover={{ scale: 1.05 }}
-            whileTap={{ scale: 0.95 }}
-            onClick={handleChromeExtension}
-            className="flex items-center justify-center gap-2 px-6 py-3 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors duration-200 shadow-lg"
-          >
-            <FaChrome className="text-xl" />
-            <span>Chrome Extension</span>
-          </motion.button>
+            <motion.button
+              whileHover={{ scale: 1.05 }}
+              whileTap={{ scale: 0.95 }}
+              onClick={handleChromeExtension}
+              className="flex items-center justify-center gap-2 px-6 py-3 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors duration-200 shadow-lg"
+            >
+              <FaChrome className="text-xl" />
+              <span>Chrome Extension</span>
+            </motion.button>
+          </div>
+
+          {/* Display remaining uploads message AFTER the buttons */}
+          {!user && (
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              className="text-center bg-white/20 backdrop-blur-md rounded-lg p-2 mt-2 text-white max-w-md"
+            >
+              <p>
+                You have {remainingUploads} free uploads remaining. <br />
+                Sign up or log in for unlimited access.
+              </p>
+            </motion.div>
+          )}
         </motion.div>
       </div>
+
+      {/* Auth Modals */}
+      <LoginModal
+        isOpen={showLoginModal}
+        onClose={() => setShowLoginModal(false)}
+        onSwitchToSignup={() => {
+          setShowLoginModal(false);
+          setShowSignupModal(true);
+        }}
+      />
+
+      <SignupModal
+        isOpen={showSignupModal}
+        onClose={() => setShowSignupModal(false)}
+        onSwitchToLogin={() => {
+          setShowSignupModal(false);
+          setShowLoginModal(true);
+        }}
+      />
+
+      {/* Unauthorized Access Dialog */}
+      <UnauthorizedDialog
+        isOpen={showUnauthorizedDialog}
+        onClose={() => setShowUnauthorizedDialog(false)}
+        onLogin={() => {
+          setShowUnauthorizedDialog(false);
+          setShowLoginModal(true);
+        }}
+        onSignup={() => {
+          setShowUnauthorizedDialog(false);
+          setShowSignupModal(true);
+        }}
+      />
     </div>
   );
 };
