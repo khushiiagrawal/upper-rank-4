@@ -52,7 +52,6 @@ const ContactSection = () => {
         throw new Error(data.error || "Failed to send message");
       }
 
-      // Success! Clear the form
       setFormData({
         name: "",
         email: "",
@@ -68,7 +67,6 @@ const ContactSection = () => {
           "Your message has been sent successfully! We'll get back to you soon.",
       });
 
-      // Reset success message after 5 seconds
       setTimeout(() => {
         setStatus((prev) => ({ ...prev, success: false, message: "" }));
       }, 5000);
@@ -113,17 +111,17 @@ const ContactSection = () => {
   ];
 
   return (
-    <section id="contact" className="py-12  relative overflow-hidden">
-      {/* Animated background elements */}
+    <section id="contact" className="py-12 relative overflow-hidden bg-white">
+      {/* Animated background */}
       <div className="absolute inset-0 pointer-events-none">
         <div
           className="absolute top-0 left-0 w-1/4 h-1/4 bg-green-100/20 rounded-full blur-3xl animate-float"
           style={{ animationDuration: "20s" }}
-        ></div>
+        />
         <div
           className="absolute bottom-0 right-0 w-1/3 h-1/3 bg-green-200/20 rounded-full blur-3xl animate-float"
           style={{ animationDuration: "16s", animationDelay: "1s" }}
-        ></div>
+        />
       </div>
 
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
@@ -135,8 +133,8 @@ const ContactSection = () => {
           variants={fadeInUp}
           className="text-center mb-16"
         >
-          <h2 className="section-title text-white">Contact Us</h2>
-          <p className="text-xl text-white max-w-3xl mx-auto">
+          <h2 className="section-title text-gray-900">Contact Us</h2>
+          <p className="text-xl text-gray-700 max-w-3xl mx-auto">
             Have questions or feedback? We&apos;d love to hear from you.
           </p>
         </motion.div>
@@ -149,13 +147,12 @@ const ContactSection = () => {
             viewport={{ once: true, margin: "-100px" }}
             transition={{ duration: 0.5, delay: 0.2 }}
             variants={fadeInUp}
-            className="card bg-green-50"
+            className="card bg-green-50 p-6 rounded-lg shadow-md"
           >
             <h3 className="text-2xl font-semibold text-gray-800 mb-6">
               Send us a message
             </h3>
 
-            {/* Status messages */}
             {status.success && (
               <div className="mb-6 p-4 bg-green-100 text-green-700 rounded-md flex items-center">
                 <FaCheckCircle className="mr-2" />
@@ -171,62 +168,26 @@ const ContactSection = () => {
             )}
 
             <form onSubmit={handleSubmit} className="space-y-6">
-              <div>
-                <label
-                  htmlFor="name"
-                  className="block text-sm font-medium text-gray-700 mb-1"
-                >
-                  Name
-                </label>
-                <input
-                  type="text"
-                  id="name"
-                  name="name"
-                  value={formData.name}
-                  onChange={handleChange}
-                  className="w-full px-4 py-2 border text-black border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500"
-                  required
-                  disabled={status.loading}
-                />
-              </div>
-
-              <div>
-                <label
-                  htmlFor="email"
-                  className="block text-sm font-medium text-gray-700 mb-1"
-                >
-                  Email
-                </label>
-                <input
-                  type="email"
-                  id="email"
-                  name="email"
-                  value={formData.email}
-                  onChange={handleChange}
-                  className="w-full px-4 py-2 border text-black border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500"
-                  required
-                  disabled={status.loading}
-                />
-              </div>
-
-              <div>
-                <label
-                  htmlFor="subject"
-                  className="block text-sm font-medium text-gray-700 mb-1"
-                >
-                  Subject
-                </label>
-                <input
-                  type="text"
-                  id="subject"
-                  name="subject"
-                  value={formData.subject}
-                  onChange={handleChange}
-                  className="w-full px-4 py-2 border text-black border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500"
-                  required
-                  disabled={status.loading}
-                />
-              </div>
+              {["name", "email", "subject"].map((field) => (
+                <div key={field}>
+                  <label
+                    htmlFor={field}
+                    className="block text-sm font-medium text-gray-700 mb-1 capitalize"
+                  >
+                    {field}
+                  </label>
+                  <input
+                    type={field === "email" ? "email" : "text"}
+                    id={field}
+                    name={field}
+                    value={formData[field as keyof typeof formData]}
+                    onChange={handleChange}
+                    className="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500 text-black"
+                    required
+                    disabled={status.loading}
+                  />
+                </div>
+              ))}
 
               <div>
                 <label
@@ -241,17 +202,17 @@ const ContactSection = () => {
                   value={formData.message}
                   onChange={handleChange}
                   rows={4}
-                  className="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500 text-black "
+                  className="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500 text-black"
                   required
                   disabled={status.loading}
-                ></textarea>
+                />
               </div>
 
               <motion.button
                 type="submit"
                 whileHover={{ scale: 1.02 }}
                 whileTap={{ scale: 0.98 }}
-                className={`btn-primary w-full flex items-center justify-center ${
+                className={`btn-primary w-full flex items-center justify-center py-3 px-6 rounded-md text-white bg-green-600 hover:bg-green-700 transition ${
                   status.loading ? "opacity-70 cursor-not-allowed" : ""
                 }`}
                 disabled={status.loading}
@@ -271,12 +232,12 @@ const ContactSection = () => {
                         r="10"
                         stroke="currentColor"
                         strokeWidth="4"
-                      ></circle>
+                      />
                       <path
                         className="opacity-75"
                         fill="currentColor"
-                        d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
-                      ></path>
+                        d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"
+                      />
                     </svg>
                     Sending...
                   </>
@@ -287,8 +248,7 @@ const ContactSection = () => {
             </form>
           </motion.div>
 
-          {/* Rest of the component remains unchanged */}
-          {/* Contact Information */}
+          {/* Contact Info */}
           <motion.div
             initial="hidden"
             whileInView="visible"
@@ -297,7 +257,7 @@ const ContactSection = () => {
             variants={fadeInUp}
             className="space-y-8"
           >
-            <h3 className="text-2xl font-semibold text-white mb-6">
+            <h3 className="text-2xl font-semibold text-gray-900 mb-6">
               Get in touch
             </h3>
 
@@ -328,52 +288,6 @@ const ContactSection = () => {
                 </div>
               </motion.a>
             ))}
-
-            {/* Social media section remains unchanged */}
-            <motion.div
-              className="mt-8 p-6 bg-green-50 rounded-lg"
-              whileHover={{ y: -5 }}
-              transition={{ duration: 0.3 }}
-            >
-              <h4 className="text-lg font-medium text-gray-800 mb-2">
-                Follow us
-              </h4>
-              <p className="text-gray-700 mb-4">
-                Stay updated with our latest news and updates on sustainable
-                waste management.
-              </p>
-              <div className="flex space-x-4">
-                {/* Social media icons */}
-                <motion.div
-                  className="w-10 h-10 bg-green-600 rounded-full flex items-center justify-center text-white"
-                  whileHover={{ scale: 1.1, rotate: 10 }}
-                  transition={{ duration: 0.3 }}
-                >
-                  FB
-                </motion.div>
-                <motion.div
-                  className="w-10 h-10 bg-green-600 rounded-full flex items-center justify-center text-white"
-                  whileHover={{ scale: 1.1, rotate: 10 }}
-                  transition={{ duration: 0.3 }}
-                >
-                  TW
-                </motion.div>
-                <motion.div
-                  className="w-10 h-10 bg-green-600 rounded-full flex items-center justify-center text-white"
-                  whileHover={{ scale: 1.1, rotate: 10 }}
-                  transition={{ duration: 0.3 }}
-                >
-                  IG
-                </motion.div>
-                <motion.div
-                  className="w-10 h-10 bg-green-600 rounded-full flex items-center justify-center text-white"
-                  whileHover={{ scale: 1.1, rotate: 10 }}
-                  transition={{ duration: 0.3 }}
-                >
-                  LI
-                </motion.div>
-              </div>
-            </motion.div>
           </motion.div>
         </div>
       </div>

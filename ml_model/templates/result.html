@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Classification Result</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #f8f9fa;
+            color: #333;
+        }
+        .container {
+            background-color: white;
+            border-radius: 8px;
+            padding: 30px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+        h1 {
+            color: #2a9d8f;
+            text-align: center;
+            margin-bottom: 30px;
+        }
+        .result-container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 20px;
+        }
+        .image-container {
+            width: 100%;
+            max-width: 400px;
+            margin-bottom: 20px;
+        }
+        .result-image {
+            width: 100%;
+            height: auto;
+            border-radius: 8px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+        .result-details {
+            text-align: center;
+            padding: 20px;
+            border-radius: 8px;
+            background-color: #f0f9f8;
+            width: 100%;
+            max-width: 400px;
+        }
+        .class-badge {
+            display: inline-block;
+            background-color: #2a9d8f;
+            color: white;
+            padding: 8px 16px;
+            border-radius: 20px;
+            font-weight: bold;
+            margin-bottom: 15px;
+            text-transform: capitalize;
+            font-size: 1.1em;
+        }
+        .confidence {
+            font-size: 18px;
+            color: #444;
+            margin-bottom: 20px;
+        }
+        .material-info {
+            margin-top: 15px;
+            padding: 15px;
+            background-color: white;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+        }
+        .btn {
+            background-color: #2a9d8f;
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 16px;
+            text-decoration: none;
+            display: inline-block;
+            transition: background-color 0.3s;
+            margin-top: 20px;
+        }
+        .btn:hover {
+            background-color: #218879;
+        }
+        /* Styling for different waste types */
+        .cardboard { background-color: #a87e4e; }
+        .glass { background-color: #3a86ff; }
+        .metal { background-color: #8d99ae; }
+        .paper { background-color: #457b9d; }
+        .plastic { background-color: #e76f51; }
+        .trash { background-color: #6c757d; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Classification Result</h1>
+        
+        <div class="result-container">
+            <div class="image-container">
+                <img src="{{ url_for('static', filename='uploads/' + filename) }}" alt="Uploaded Image" class="result-image">
+            </div>
+            
+            <div class="result-details">
+                <div class="class-badge">{{ predicted_class.replace('_', ' ') }}</div>
+                <div class="confidence">Confidence: {{ confidence|round(2) }}%</div>
+            </div>
+            
+            <a href="{{ url_for('index') }}" class="btn">Classify Another Image</a>
+        </div>
+    </div>
+</body>
+</html> 

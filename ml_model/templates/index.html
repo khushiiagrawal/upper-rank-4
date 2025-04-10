@@ -1,0 +1,187 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Trash Classification</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #f8f9fa;
+            color: #333;
+        }
+        .container {
+            background-color: white;
+            border-radius: 8px;
+            padding: 30px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+        h1 {
+            color: #2a9d8f;
+            text-align: center;
+            margin-bottom: 30px;
+        }
+        .upload-container {
+            border: 2px dashed #ccc;
+            border-radius: 8px;
+            padding: 40px 20px;
+            text-align: center;
+            margin-bottom: 20px;
+            transition: border-color 0.3s;
+        }
+        .upload-container:hover {
+            border-color: #2a9d8f;
+        }
+        .upload-container.highlight {
+            border-color: #2a9d8f;
+            background-color: #f0f9f8;
+        }
+        .file-input {
+            display: none;
+        }
+        .upload-button {
+            background-color: #2a9d8f;
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 16px;
+            transition: background-color 0.3s;
+        }
+        .upload-button:hover {
+            background-color: #218879;
+        }
+        .preview-container {
+            margin-top: 20px;
+            display: none;
+        }
+        .preview-image {
+            max-width: 100%;
+            max-height: 300px;
+            border-radius: 4px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+        .submit-button {
+            background-color: #e76f51;
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 16px;
+            margin-top: 20px;
+            display: none;
+            transition: background-color 0.3s;
+        }
+        .submit-button:hover {
+            background-color: #d65f41;
+        }
+        .info-text {
+            margin-top: 20px;
+            color: #666;
+            font-size: 14px;
+            text-align: center;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Trash Classification</h1>
+        
+        <form action="/upload" method="post" enctype="multipart/form-data" id="upload-form">
+            <div class="upload-container" id="drop-area">
+                <p>Drag & drop your image here or</p>
+                <button type="button" class="upload-button" id="browse-button">Browse Files</button>
+                <input type="file" name="file" id="file-input" class="file-input" accept=".jpg, .jpeg, .png">
+            </div>
+            
+            <div class="preview-container" id="preview-container">
+                <img id="preview-image" class="preview-image" src="#" alt="Preview">
+                <button type="submit" class="submit-button" id="submit-button">Classify Image</button>
+            </div>
+        </form>
+        
+        <p class="info-text">
+            Upload an image of trash to classify it into one of the following categories:<br>
+            Cardboard, Glass, Metal, Paper, Plastic, or Trash
+        </p>
+    </div>
+
+    <script>
+        const dropArea = document.getElementById('drop-area');
+        const fileInput = document.getElementById('file-input');
+        const browseButton = document.getElementById('browse-button');
+        const previewContainer = document.getElementById('preview-container');
+        const previewImage = document.getElementById('preview-image');
+        const submitButton = document.getElementById('submit-button');
+
+        // Browse button click
+        browseButton.addEventListener('click', () => {
+            fileInput.click();
+        });
+
+        // File input change
+        fileInput.addEventListener('change', handleFileSelect);
+
+        // Drag and drop events
+        ['dragenter', 'dragover', 'dragleave', 'drop'].forEach(eventName => {
+            dropArea.addEventListener(eventName, preventDefaults, false);
+        });
+
+        function preventDefaults(e) {
+            e.preventDefault();
+            e.stopPropagation();
+        }
+
+        ['dragenter', 'dragover'].forEach(eventName => {
+            dropArea.addEventListener(eventName, highlight, false);
+        });
+
+        ['dragleave', 'drop'].forEach(eventName => {
+            dropArea.addEventListener(eventName, unhighlight, false);
+        });
+
+        function highlight() {
+            dropArea.classList.add('highlight');
+        }
+
+        function unhighlight() {
+            dropArea.classList.remove('highlight');
+        }
+
+        dropArea.addEventListener('drop', handleDrop, false);
+
+        function handleDrop(e) {
+            const dt = e.dataTransfer;
+            const files = dt.files;
+            fileInput.files = files;
+            handleFileSelect();
+        }
+
+        function handleFileSelect() {
+            if (fileInput.files.length > 0) {
+                const file = fileInput.files[0];
+                
+                // Check if the file is an image
+                if (!file.type.match('image.*')) {
+                    alert('Please select an image file (JPG, JPEG, or PNG).');
+                    return;
+                }
+                
+                // Display the preview
+                const reader = new FileReader();
+                reader.onload = e => {
+                    previewImage.src = e.target.result;
+                    previewContainer.style.display = 'block';
+                    submitButton.style.display = 'block';
+                };
+                reader.readAsDataURL(file);
+            }
+        }
+    </script>
+</body>
+</html> 

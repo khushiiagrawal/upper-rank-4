@@ -1,7 +1,5 @@
-node_modules
-.DS_Store
+.venv
 3RVision.keras
-
 # Environment variables
 .env
 .env.local
