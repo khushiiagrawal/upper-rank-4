@@ -9,6 +9,7 @@
     "lint": "next lint"
   },
   "dependencies": {
+    "@fingerprintjs/fingerprintjs": "^4.6.2",
     "@google/generative-ai": "^0.24.0",
     "@react-three/drei": "^10.0.6",
     "@react-three/fiber": "^9.1.2",
