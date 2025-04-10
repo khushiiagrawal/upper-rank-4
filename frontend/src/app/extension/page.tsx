@@ -115,7 +115,7 @@ const ExtensionPage = () => {
             transition={{ duration: 0.8, delay: 0.2 }}
             className="text-4xl md:text-6xl font-bold text-white mb-4 drop-shadow-lg"
           >
-            R3Vision Browser Extension
+            3RVision Browser Extension
           </motion.h1>
           <motion.p
             initial={{ opacity: 0, y: 20 }}
@@ -170,10 +170,10 @@ const ExtensionPage = () => {
                 className="bg-white/20 backdrop-blur-sm rounded-2xl p-8 shadow-lg border border-white/10"
               >
                 <h2 className="text-2xl font-bold mb-4 text-white">
-                  What is R3Vision?
+                  What is 3RVision?
                 </h2>
                 <p className="text-white/90 leading-relaxed">
-                  R3Vision is a powerful Chrome extension designed to help you
+                  3RVision is a powerful Chrome extension designed to help you
                   discover eco-friendly products while shopping online. It
                   automatically enhances your search queries and filters results
                   to show only sustainable products across major e-commerce
@@ -327,7 +327,7 @@ const ExtensionPage = () => {
                     {
                       title: "Download the extension",
                       description:
-                        "Download the R3Vision extension files from our official website.",
+                        "Download the 3RVision extension files from our official website.",
                     },
                     {
                       title: "Access extensions page",
