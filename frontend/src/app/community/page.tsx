@@ -262,6 +262,24 @@ const CommunityPage = () => {
     }
   };
 
+  const handleComment = (postId: string, newComment: any) => {
+    setPosts((prevPosts) =>
+      prevPosts.map((post) => {
+        if (post._id === postId) {
+          // Make sure comments is initialized as an array
+          const currentComments = Array.isArray(post.comments)
+            ? post.comments
+            : [];
+          return {
+            ...post,
+            comments: [...currentComments, newComment],
+          };
+        }
+        return post;
+      })
+    );
+  };
+
   return (
     <div className="min-h-screen bg-gradient-to-b from-green-50 to-white">
       <Navbar />
