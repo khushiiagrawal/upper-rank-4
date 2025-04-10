@@ -127,10 +127,39 @@ const Earth3D = ({ scale = 1 }: { scale?: number }) => {
   const [mousePosition, setMousePosition] = useState({ x: 0, y: 0 });
   const [isMouseMoving, setIsMouseMoving] = useState(false);
   const mouseTimeoutRef = useRef<NodeJS.Timeout | null>(null);
+  const [responsiveScale, setResponsiveScale] = useState(scale);
 
   // Smoothed rotation state
   const targetRotation = useRef({ x: 0, y: 0 });
   const defaultRotationSpeed = useRef(0.02); // Significantly increased default rotation speed
+
+  // Handle responsive scaling
+  useEffect(() => {
+    const handleResize = () => {
+      // Check if we're on a mobile device based on screen width
+      if (window.innerWidth < 768) {
+        // Mobile devices - reduce the scale by 40%
+        setResponsiveScale(scale * 0.6);
+      } else if (window.innerWidth < 1024) {
+        // Tablets - reduce the scale by 20%
+        setResponsiveScale(scale * 0.8);
+      } else {
+        // Desktop - use the original scale
+        setResponsiveScale(scale);
+      }
+    };
+
+    // Set initial scale
+    handleResize();
+
+    // Add event listener for window resize
+    window.addEventListener("resize", handleResize);
+
+    // Cleanup event listener
+    return () => {
+      window.removeEventListener("resize", handleResize);
+    };
+  }, [scale]);
 
   useEffect(() => {
     if (earthRef.current) {
@@ -193,7 +222,7 @@ const Earth3D = ({ scale = 1 }: { scale?: number }) => {
   });
 
   return (
-    <Sphere ref={earthRef} args={[2, 128, 128]} scale={scale}>
+    <Sphere ref={earthRef} args={[2, 128, 128]} scale={responsiveScale}>
       <shaderMaterial
         ref={materialRef}
         vertexShader={vertexShader}
