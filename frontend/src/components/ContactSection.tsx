@@ -113,7 +113,7 @@ const ContactSection = () => {
   ];
 
   return (
-    <section id="contact" className="py-12 bg-white relative overflow-hidden">
+    <section id="contact" className="py-12  relative overflow-hidden">
       {/* Animated background elements */}
       <div className="absolute inset-0 pointer-events-none">
         <div
@@ -135,8 +135,8 @@ const ContactSection = () => {
           variants={fadeInUp}
           className="text-center mb-16"
         >
-          <h2 className="section-title">Contact Us</h2>
-          <p className="text-xl text-gray-700 max-w-3xl mx-auto">
+          <h2 className="section-title text-white">Contact Us</h2>
+          <p className="text-xl text-white max-w-3xl mx-auto">
             Have questions or feedback? We&apos;d love to hear from you.
           </p>
         </motion.div>
@@ -297,7 +297,7 @@ const ContactSection = () => {
             variants={fadeInUp}
             className="space-y-8"
           >
-            <h3 className="text-2xl font-semibold text-gray-800 mb-6">
+            <h3 className="text-2xl font-semibold text-white mb-6">
               Get in touch
             </h3>
 

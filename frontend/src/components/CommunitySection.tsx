@@ -57,7 +57,7 @@ const CommunitySection = () => {
   };
 
   return (
-    <section id="community" className="py-20 bg-white relative">
+    <section id="community" className="py-20  relative">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <motion.div
           initial={{ opacity: 0, y: 20 }}
@@ -66,10 +66,10 @@ const CommunitySection = () => {
           transition={{ duration: 0.5 }}
           className="text-center mb-16"
         >
-          <h2 className="text-4xl font-bold text-green-600 mb-4">
+          <h2 className="text-4xl font-bold text-white mb-4">
             Join Our Community
           </h2>
-          <p className="text-xl text-gray-600 max-w-2xl mx-auto">
+          <p className="text-xl text-white max-w-2xl mx-auto">
             Be part of a growing community dedicated to making a difference in
             waste management and sustainability.
           </p>
@@ -83,14 +83,14 @@ const CommunitySection = () => {
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true }}
               transition={{ duration: 0.5, delay: index * 0.1 }}
-              className="bg-white rounded-lg p-6 shadow-lg hover:shadow-xl transition-shadow duration-300"
+              className="border border-white rounded-lg p-6 shadow-lg hover:shadow-xl transition-shadow duration-300"
             >
               <div className="flex flex-col items-center text-center">
                 <div className="mb-4">{feature.icon}</div>
                 <h3 className="text-xl font-semibold text-green-600 mb-2">
                   {feature.title}
                 </h3>
-                <p className="text-gray-600">{feature.description}</p>
+                <p className="text-white">{feature.description}</p>
               </div>
             </motion.div>
           ))}

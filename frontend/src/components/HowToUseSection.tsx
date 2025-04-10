@@ -210,62 +210,9 @@ const HowToUseSection = () => {
   return (
     <section
       ref={sectionRef}
-      className="py-12 bg-gradient-to-b from-green-50 to-white relative overflow-hidden"
+      className="py-12 relative overflow-hidden bg-transparent"
       id="how-to-use"
     >
-      {/* Background Elements */}
-      <div className="absolute inset-0 overflow-hidden">
-        {mounted && (
-          <>
-            <motion.div
-              initial={{ opacity: 0, scale: 0.8 }}
-              animate={
-                isVisible
-                  ? {
-                      opacity: 0.1,
-                      scale: generatePositions(1).scale,
-                      x: `${generatePositions(1).x}%`,
-                      y: `${generatePositions(1).y}%`,
-                    }
-                  : { opacity: 0, scale: 0.8 }
-              }
-              transition={{ duration: 1.5, delay: 0.2 }}
-              className="absolute w-64 h-64 bg-green-300 rounded-full filter blur-3xl"
-            />
-            <motion.div
-              initial={{ opacity: 0, scale: 0.8 }}
-              animate={
-                isVisible
-                  ? {
-                      opacity: 0.1,
-                      scale: generatePositions(2).scale,
-                      x: `${generatePositions(2).x}%`,
-                      y: `${generatePositions(2).y}%`,
-                    }
-                  : { opacity: 0, scale: 0.8 }
-              }
-              transition={{ duration: 1.5, delay: 0.4 }}
-              className="absolute w-64 h-64 bg-blue-300 rounded-full filter blur-3xl"
-            />
-            <motion.div
-              initial={{ opacity: 0, scale: 0.8 }}
-              animate={
-                isVisible
-                  ? {
-                      opacity: 0.1,
-                      scale: generatePositions(3).scale,
-                      x: `${generatePositions(3).x}%`,
-                      y: `${generatePositions(3).y}%`,
-                    }
-                  : { opacity: 0, scale: 0.8 }
-              }
-              transition={{ duration: 1.5, delay: 0.6 }}
-              className="absolute w-64 h-64 bg-yellow-300 rounded-full filter blur-3xl"
-            />
-          </>
-        )}
-      </div>
-
       <div className="container mx-auto px-4 relative z-10">
         <motion.div
           initial={{ opacity: 0, y: 20 }}
@@ -273,10 +220,10 @@ const HowToUseSection = () => {
           transition={{ duration: 0.8 }}
           className="text-center mb-16"
         >
-          <h2 className="text-4xl font-bold text-gray-900 mb-4">
+          <h2 className="text-4xl font-bold text-white mb-4">
             How to Use 3RVision
           </h2>
-          <p className="text-xl text-gray-600 max-w-3xl mx-auto">
+          <p className="text-xl text-white/90 max-w-3xl mx-auto">
             Our platform makes waste management simple and effective. Follow
             these steps to get started.
           </p>
@@ -289,7 +236,7 @@ const HowToUseSection = () => {
               initial={{ opacity: 0, y: 20 }}
               animate={isVisible ? { opacity: 1, y: 0 } : { opacity: 0, y: 20 }}
               transition={{ duration: 0.8, delay: 0.2 + index * 0.2 }}
-              className="bg-white rounded-xl shadow-lg p-8 text-center"
+              className="bg-white/20 backdrop-blur-sm rounded-xl shadow-lg p-8 text-center border border-white/10"
             >
               <motion.div
                 initial={{ scale: 0.8 }}
@@ -299,14 +246,14 @@ const HowToUseSection = () => {
                   delay: 0.4 + index * 0.2,
                   type: "spring",
                 }}
-                className="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-6 text-green-600"
+                className="w-16 h-16 bg-green-600/30 rounded-full flex items-center justify-center mx-auto mb-6 text-white"
               >
                 {step.icon}
               </motion.div>
-              <h3 className="text-xl font-semibold text-gray-900 mb-3">
+              <h3 className="text-xl font-semibold text-white mb-3">
                 {step.title}
               </h3>
-              <p className="text-gray-600">{step.description}</p>
+              <p className="text-white/80">{step.description}</p>
             </motion.div>
           ))}
         </div>
