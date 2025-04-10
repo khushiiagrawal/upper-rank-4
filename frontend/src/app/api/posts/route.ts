@@ -1,6 +1,8 @@
 import { NextResponse } from 'next/server';
 import clientPromise from '@/lib/mongodb';
 import { ObjectId } from 'mongodb';
+import { cookies } from 'next/headers'; // Add this import
+import { verifyToken } from '@/lib/jwt'; // Add this import (assuming you have this function)
 
 // GET /api/posts - Get all posts
 export async function GET() {
@@ -24,50 +26,40 @@ export async function GET() {
 }
 
 // POST /api/posts - Create a new post
-export async function POST(request: Request) {
+export async function POST(req: Request) {
   try {
+    // Get user from JWT token in cookies
+    const cookieStore = await cookies();
+    const token = cookieStore.get('token')?.value;
+    
+    // Get user data from token
+    let user = null;
+    if (token) {
+      try {
+        user = verifyToken(token);
+      } catch (error) {
+        console.error('Invalid token:', error);
+      }
+    }
+    
+    const userData = await req.json();
+    
+    // Ensure the author field is set from the authenticated user
+    const postData = {
+      ...userData,
+      author: (user && typeof user === 'object' && 'name' in user ? user.name : undefined) || userData.author || "Anonymous",
+      timestamp: new Date().toISOString(),
+    };
+    
     const client = await clientPromise;
     const db = client.db('3rvision');
     
-    // Parse the request body as JSON
-    const data = await request.json();
-    
-    // Extract fields from the request body
-    const {
-      title,
-      description,
-      tags,
-      platformUsage,
-      category,
-      postType,
-      linkUrl,
-      image
-    } = data;
-    
-    // Create post object
-    const post = {
-      title,
-      description,
-      image,
-      tags: Array.isArray(tags) ? tags : [],
-      platformUsage,
-      category,
-      postType: postType || 'text',
-      linkUrl,
-      author: "Anonymous", // This would come from user authentication
-      timestamp: new Date().toISOString(),
-      likes: 0,
-      comments: [],
-      totalVotes: 0,
-      userVote: null
-    };
-    
     // Insert post into database
-    const result = await db.collection('posts').insertOne(post);
+    const result = await db.collection('posts').insertOne(postData);
     
     // Return the created post with its ID
     return NextResponse.json({
-      ...post,
+      ...postData,
       _id: result.insertedId
     });
   } catch (error) {
@@ -77,4 +69,4 @@ export async function POST(request: Request) {
       { status: 500 }
     );
   }
-} 
+}
