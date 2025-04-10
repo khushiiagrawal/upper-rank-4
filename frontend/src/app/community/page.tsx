@@ -18,6 +18,7 @@ import {
 import { IoMdClose } from "react-icons/io";
 import CreatePostModal from "@/components/CreatePostModal";
 import PostCard from "@/components/PostCard";
+import { useAuth } from "@/context/AuthContext";
 
 // Define the Comment type
 interface Comment {
@@ -63,6 +64,7 @@ interface ApiPost {
 
 // Main Community Page component
 const CommunityPage = () => {
+  const { user } = useAuth();
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [posts, setPosts] = useState<Post[]>([]);
   const [loading, setLoading] = useState(true);
@@ -134,12 +136,16 @@ const CommunityPage = () => {
   // Handle creating a new post
   const handleCreatePost = async (postData: any) => {
     try {
+      // Make sure the author is included in the request
       const response = await fetch("/api/posts", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
         },
-        body: JSON.stringify(postData),
+        body: JSON.stringify({
+          ...postData,
+          author: user?.name, // Ensure the author is set
+        }),
       });
 
       if (!response.ok) {

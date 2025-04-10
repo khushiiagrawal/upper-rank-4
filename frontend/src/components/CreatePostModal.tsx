@@ -5,6 +5,7 @@ import { motion } from "framer-motion";
 import { FaUpload, FaTags, FaImage, FaLink } from "react-icons/fa";
 import { IoMdClose } from "react-icons/io";
 import { MdPreview } from "react-icons/md";
+import { useAuth } from "@/context/AuthContext";
 
 interface CreatePostModalProps {
   isOpen: boolean;
@@ -17,6 +18,7 @@ const CreatePostModal = ({
   onClose,
   onSubmit,
 }: CreatePostModalProps) => {
+  const { user } = useAuth(); // Get the authenticated user
   const [title, setTitle] = useState("");
   const [description, setDescription] = useState("");
   const [imageFile, setImageFile] = useState<File | null>(null);
@@ -116,6 +118,7 @@ const CreatePostModal = ({
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    if (isSubmitting) return;
 
     if (!validateForm()) {
       return;
@@ -137,6 +140,7 @@ const CreatePostModal = ({
         postType,
         linkUrl: postType === "link" ? linkUrl : undefined,
         image: imagePreview,
+        author: user?.name || "Anonymous", // Make sure it's not undefined
       };
 
       // Submit post to API
