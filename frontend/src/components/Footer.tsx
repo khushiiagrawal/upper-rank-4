@@ -3,9 +3,17 @@
 import { motion } from "framer-motion";
 import Link from "next/link";
 import { FaFacebook, FaTwitter, FaInstagram, FaLinkedin } from "react-icons/fa";
+import { useState, useEffect } from "react"; // Add this import
 
 const Footer = () => {
-  const currentYear = new Date().getFullYear();
+  const [mounted, setMounted] = useState(false);
+  const [currentYear, setCurrentYear] = useState(new Date().getFullYear());
+
+  // Ensure component is mounted before rendering client-side content
+  useEffect(() => {
+    setMounted(true);
+    setCurrentYear(new Date().getFullYear());
+  }, []);
 
   const socialLinks = [
     { icon: <FaFacebook />, url: "https://facebook.com", label: "Facebook" },
@@ -23,6 +31,17 @@ const Footer = () => {
     { title: "Terms of Service", url: "/terms-of-service" },
   ];
 
+  // Return simple placeholder during SSR to prevent hydration mismatch
+  if (!mounted) {
+    return (
+      <footer className="bg-gray-900 text-white">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+          {/* Simple loading placeholder */}
+        </div>
+      </footer>
+    );
+  }
+
   return (
     <footer className="bg-gray-900 text-white">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
@@ -36,8 +55,7 @@ const Footer = () => {
               transition={{ duration: 0.5 }}
             >
               <Link href="/" className="flex items-center">
-           
-              <img src="/logo.png" alt="Logo" className="h-24 w-auto" />
+                <img src="/logo.png" alt="Logo" className="h-24 w-auto" />
               </Link>
               <p className="text-gray-400 mb-4">
                 Redefining waste management through AI-driven intelligence for a
