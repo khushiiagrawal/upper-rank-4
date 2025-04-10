@@ -4,6 +4,7 @@ import { useState, useEffect } from "react";
 import { motion } from "framer-motion";
 import { FaHeart, FaComment, FaShare, FaEllipsisH } from "react-icons/fa";
 import Image from "next/image";
+import { useAuth } from "@/context/AuthContext"; // Add this import
 
 interface Comment {
   id: string;
@@ -20,6 +21,7 @@ interface Post {
   author: string;
   timestamp: string;
   likes: number;
+  userId?: string; // Add this property to the Post interface
   comments: Comment[];
   tags: string[];
   postType?: "text" | "image" | "poll";
@@ -36,6 +38,7 @@ interface PostCardProps {
 }
 
 const PostCard = ({ post, onLike, onComment, onVote }: PostCardProps) => {
+  const { user } = useAuth(); // Get the authenticated user
   const [isLiked, setIsLiked] = useState(false);
   const [showComments, setShowComments] = useState(false);
   const [commentText, setCommentText] = useState("");
@@ -74,7 +77,10 @@ const PostCard = ({ post, onLike, onComment, onVote }: PostCardProps) => {
         headers: {
           "Content-Type": "application/json",
         },
-        body: JSON.stringify({ text: commentText }),
+        body: JSON.stringify({
+          text: commentText,
+          author: user?.name || "User", // Use authenticated user name for new comments
+        }),
       });
 
       if (response.ok) {
@@ -111,9 +117,9 @@ const PostCard = ({ post, onLike, onComment, onVote }: PostCardProps) => {
   // Ensure comments is always an array
   const comments = Array.isArray(post.comments) ? post.comments : [];
 
-  // Get author initial with fallback
+  // Get author initial with proper fallback
   const getAuthorInitial = (author: string | undefined | null) => {
-    if (!author || typeof author !== "string") return "?";
+    if (!author || typeof author !== "string") return "U"; // Changed from "?" to "U" for "User"
     return author.charAt(0).toUpperCase();
   };
 
@@ -129,6 +135,21 @@ const PostCard = ({ post, onLike, onComment, onVote }: PostCardProps) => {
     } catch (e) {
       return timestamp;
     }
+  };
+
+  // More robust author display logic
+  const displayAuthor = () => {
+    // For new posts created by this user
+    if (post.author === user?.name) return user.name;
+
+    // For posts with a valid author name
+    if (post.author && post.author !== "Anonymous") return post.author;
+
+    // For legacy "Anonymous" posts that belong to this user (if you have a userId field)
+    if (user && post.userId === user.id) return user.name;
+
+    // Default fallback
+    return post.author || "User";
   };
 
   // Return loading state during SSR to prevent hydration mismatch
@@ -165,9 +186,7 @@ const PostCard = ({ post, onLike, onComment, onVote }: PostCardProps) => {
             </span>
           </div>
           <div>
-            <h3 className="font-medium text-gray-900">
-              {post.author || "Anonymous"}
-            </h3>
+            <h3 className="font-medium text-gray-900">{displayAuthor()}</h3>
             <p className="text-sm text-gray-500">
               {formatTimestamp(post.timestamp)}
             </p>
@@ -317,7 +336,9 @@ const PostCard = ({ post, onLike, onComment, onVote }: PostCardProps) => {
                   key={comment.id || index}
                   className="bg-gray-50 p-2 rounded-lg"
                 >
-                  <p className="text-sm font-medium">{comment.author}</p>
+                  <p className="text-sm font-medium">
+                    {comment.author || user?.name || "User"}
+                  </p>
                   <p className="text-sm text-gray-600">{comment.text}</p>
                 </div>
               ))}
