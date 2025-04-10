@@ -10,8 +10,10 @@ import { useAuth } from "@/context/AuthContext";
 import UnauthorizedDialog from "./UnauthorizedDialog";
 import LoginModal from "./LoginModal";
 import SignupModal from "./SignupModal";
+import { useRouter } from "next/navigation";
 
 const HeroSection = () => {
+  const router = useRouter();
   const [showCamera, setShowCamera] = useState(false);
   const [cameraStream, setCameraStream] = useState<MediaStream | null>(null);
   const [capturedImage, setCapturedImage] = useState<string | null>(null);
@@ -154,8 +156,7 @@ const HeroSection = () => {
   };
 
   const handleChromeExtension = () => {
-    // Implement Chrome extension link
-    window.open("https://chrome.google.com/webstore", "_blank");
+    router.push("/extension");
   };
 
   return (
