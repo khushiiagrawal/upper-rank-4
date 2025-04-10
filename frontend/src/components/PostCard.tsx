@@ -79,17 +79,28 @@ const PostCard = ({ post, onLike, onComment, onVote }: PostCardProps) => {
         },
         body: JSON.stringify({
           text: commentText,
-          author: user?.name || "User", // Use authenticated user name for new comments
-        }),
+        }), // We only need to send the text; the API will get author from token
       });
 
-      if (response.ok) {
-        const newComment = await response.json();
-        onComment(post._id, newComment);
-        setCommentText("");
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.error || "Failed to post comment");
       }
+
+      const newComment = await response.json();
+
+      // Update the local state to show the new comment immediately
+      const updatedComments = [...(post.comments || []), newComment];
+      post.comments = updatedComments;
+
+      // Call the parent component's callback
+      onComment(post._id, newComment);
+
+      // Clear the input field
+      setCommentText("");
     } catch (error) {
       console.error("Error commenting on post:", error);
+      alert("Failed to post comment. Please try again.");
     }
   };
 
@@ -319,7 +330,7 @@ const PostCard = ({ post, onLike, onComment, onVote }: PostCardProps) => {
                   value={commentText}
                   onChange={(e) => setCommentText(e.target.value)}
                   placeholder="Write a comment..."
-                  className="flex-1 px-3 py-1 border rounded-full text-sm focus:outline-none focus:ring-2 focus:ring-green-500"
+                  className="text-black  flex-1 px-3 py-1 border rounded-full text-sm focus:outline-none focus:ring-2 focus:ring-green-500"
                 />
                 <button
                   type="submit"
@@ -336,7 +347,7 @@ const PostCard = ({ post, onLike, onComment, onVote }: PostCardProps) => {
                   key={comment.id || index}
                   className="bg-gray-50 p-2 rounded-lg"
                 >
-                  <p className="text-sm font-medium">
+                  <p className="text-sm font-medium text-green-500">
                     {comment.author || user?.name || "User"}
                   </p>
                   <p className="text-sm text-gray-600">{comment.text}</p>
