@@ -27,7 +27,6 @@ JalRakshak is an integrated solution for water health surveillance, designed for
 - **Framework:** Next.js 14 with TypeScript, App Router, and Server Components
 - **UI/UX:** Tailwind CSS, Framer Motion animations, responsive design
 - **PWA:** Service workers, offline functionality, push notifications
-- **Maps:** Google Maps integration with custom overlays and clustering
 - **Internationalization:** Next-intl for multi-language support (Hindi, English, Assamese, Bangla, Bodo, Mizo, Manipuri, Nepali)
 
 ### Mobile Application
@@ -42,7 +41,6 @@ JalRakshak is an integrated solution for water health surveillance, designed for
 - **Database:** MongoDB for scalable data storage and analytics
 - **Real-time:** Firebase Realtime Database for live alerts and notifications
 - **File Storage:** S3 bucket for images, videos, and documents
-- **APIs:** RESTful APIs with Express.js and GraphQL for complex queries
 
 ### AI & Machine Learning
 - **Text Processing:** Python-based summarization API using transformers
@@ -81,23 +79,6 @@ JalRakshak is an integrated solution for water health surveillance, designed for
 - **Layer Management:** Water sources, contamination zones, sensor locations, and jurisdiction boundaries
 - **Historical Data:** Time-lapse visualization of water quality changes
 - **Offline Maps:** Cached mapping data for areas with limited connectivity
-
-## Quick Start
-
-### For General Users
-1. **Web Platform:** Visit [jalrakshak-lemon.vercel.app](https://jalrakshak-lemon.vercel.app)
-2. **Mobile App:** See `app-android/README.md` for development setup
-3. **Registration:** Create account with location verification and notification preferences
-
-### For Healthcare Workers
-1. **Dashboard Access:** Login with healthcare worker credentials for specialized dashboard
-2. **Training Materials:** Access built-in training modules for water-related health monitoring
-3. **Integration:** Connect with existing health information systems and patient management tools
-
-### For Legal Authorities
-1. **Authority Portal:** Specialized login for compliance monitoring and enforcement tools
-2. **Jurisdiction Setup:** Configure monitoring areas and compliance thresholds
-3. **Reporting Access:** Advanced analytics and legal documentation tools
 
 ## SIH Relevance
 
