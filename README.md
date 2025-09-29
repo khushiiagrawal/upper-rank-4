@@ -4,37 +4,171 @@ JalRakshak is an integrated solution for water health surveillance, designed for
 
 ## Features
 
+### Core Platform
 - **Multi-platform:** Android app & Web dashboard (Next.js)
-- **Real-time Alerts:** ML-powered, from sensors and field reports
-- **Water Source Watchlist:** Track and get updates on selected water bodies
-- **Interactive Map:** Visualize water bodies with live health status
-- **Reporting:** File water health reports, view summaries, and send info to authorities
-- **Admin Panel:** Manage users, media, and system data
+- **Multi-lingual Support:** Available in Hindi, English, Tamil, Telugu, Bengali, and Marathi for wider accessibility
 - **PWA Support:** Works offline and as an installable web app
+- **Cross-device Sync:** Seamless data synchronization across all devices
+
+### Specialized Dashboards
+- **Healthcare Worker Dashboard:** Dedicated interface for medical professionals to monitor water-related health impacts, disease tracking, and outbreak management
+- **Legal Authority Dashboard:** Compliance monitoring, regulatory reporting, legal documentation, and enforcement tracking tools
+- **Admin Panel:** Comprehensive system management, user administration, media management, and system analytics
+- **Public Dashboard:** General public access for water quality information and community reporting
+
+### Water Monitoring & Alerts
+- **Real-time Alerts:** ML-powered alerts from IoT sensors and field reports with severity classification
+- **Water Source Watchlist:** Track and receive updates on selected water bodies with custom notification preferences
+- **Interactive Maps:** Visualize water bodies with live health status, contamination levels, and historical data
+- **Predictive Analytics:** AI-driven predictions for water quality trends and potential contamination events
+
+### Reporting & Communication
+- **Field Reporting:** Comprehensive water health report filing with photo/video evidence and GPS tagging
+- **Automated Summarization:** AI-powered report summarization for quick insights and decision making
+- **Authority Notifications:** Automated alerts to relevant authorities based on severity and jurisdiction
+- **Community Engagement:** Public reporting interface and community feedback system
+- **Emergency Response:** Rapid alert system for critical water safety incidents
 
 ## Tech Stack
 
-- **Frontend:** Next.js (TypeScript), PWA-ready, UI components for dashboard, map & admin
-- **Mobile:** Android (Kotlin, Jetpack Compose, Dagger/Hilt)
-- **Backend:** Firebase (auth, reports, messaging), MongoDB (alerts, storage), Python (Summarization ML API)
-- **Observability:** Prometheus + Grafana for IoT sensor monitoring
+### Frontend & Web
+- **Framework:** Next.js 14 with TypeScript, App Router, and Server Components
+- **UI/UX:** Tailwind CSS, Framer Motion animations, responsive design
+- **PWA:** Service workers, offline functionality, push notifications
+- **Maps:** Google Maps integration with custom overlays and clustering
+- **Internationalization:** Next-intl for multi-language support (Hindi, English, Tamil, Telugu, Bengali, Marathi)
+
+### Mobile Application
+- **Platform:** Android (Kotlin, Jetpack Compose)
+- **Architecture:** Clean Architecture with MVVM pattern
+- **DI:** Dagger/Hilt for dependency injection
+- **Location:** GPS tracking and geofencing for water source monitoring
+- **Camera:** Image capture and processing for field reports
+
+### Backend & Infrastructure
+- **Authentication:** Firebase Auth with role-based access control
+- **Database:** MongoDB for scalable data storage and analytics
+- **Real-time:** Firebase Realtime Database for live alerts and notifications
+- **File Storage:** Firebase Storage for images, videos, and documents
+- **APIs:** RESTful APIs with Express.js and GraphQL for complex queries
+
+### AI & Machine Learning
+- **Text Processing:** Python-based summarization API using transformers
+- **Image Analysis:** TensorFlow/PyTorch models for water quality assessment from images
+- **Predictive Analytics:** Time series forecasting for water quality trends
+- **Natural Language:** Multi-language text processing and translation services
+
+### Monitoring & Analytics
+- **IoT Monitoring:** Prometheus + Grafana for sensor data visualization
+- **Application Monitoring:** Real-time performance and error tracking
+- **Data Analytics:** Advanced reporting and dashboard analytics
+- **Security:** End-to-end encryption, secure API endpoints, and data protection
 
 ## Modules
 
-- **Sensors:** Arduino/Firebase for water quality
-- **User:** Onboarding, home location, watchlist
-- **Alerts:** Critical, warning, info; real-time push and dashboard display
-- **Map:** Google Maps (Android), custom overlays (Web)
-- **Reporting:** User field reports, summarization, admin actions
+### Sensor Management
+- **IoT Integration:** Arduino-based sensors with Firebase connectivity for real-time data
+- **Water Quality Metrics:** pH, turbidity, dissolved oxygen, temperature, and contamination detection
+- **Calibration System:** Remote sensor calibration and maintenance scheduling
+- **Data Validation:** Automated data quality checks and anomaly detection
+
+### User Management & Authentication
+- **Multi-role System:** Citizens, healthcare workers, legal authorities, and administrators
+- **Onboarding:** Guided setup with location services and notification preferences
+- **Profile Management:** Personal dashboards with activity history and saved locations
+- **Watchlist:** Personalized monitoring of selected water sources with custom alerts
+
+### Alert & Notification System
+- **Severity Levels:** Critical (immediate health risk), Warning (potential issues), Info (updates)
+- **Multi-channel Delivery:** Push notifications, SMS, email, and in-app alerts
+- **Geo-targeted Alerts:** Location-based notifications for nearby water sources
+- **Emergency Broadcasting:** Mass notification system for water-related emergencies
+
+### Mapping & Visualization
+- **Interactive Maps:** Google Maps (Android) with custom web-based mapping solution
+- **Layer Management:** Water sources, contamination zones, sensor locations, and jurisdiction boundaries
+- **Historical Data:** Time-lapse visualization of water quality changes
+- **Offline Maps:** Cached mapping data for areas with limited connectivity
+
+### Reporting & Documentation
+- **Field Reports:** Comprehensive water quality reporting with multimedia evidence
+- **AI Summarization:** Automated report processing and key insight extraction
+- **Compliance Tracking:** Legal authority tools for regulatory monitoring and enforcement
+- **Data Export:** Comprehensive reporting tools with multiple export formats
+- **Audit Trails:** Complete activity logging for accountability and transparency
 
 ## Quick Start
 
-1. **Web:** Visit [jalrakshak-lemon.vercel.app](https://jalrakshak-lemon.vercel.app)
-2. **Android:** See `app-android/README.md` for setup
-3. **API/ML:** Python summarizer available in `Summerizer-model/`
+### For General Users
+1. **Web Platform:** Visit [jalrakshak-lemon.vercel.app](https://jalrakshak-lemon.vercel.app)
+2. **Mobile App:** Download from Google Play Store or see `app-android/README.md` for development setup
+3. **Registration:** Create account with location verification and notification preferences
+
+### For Healthcare Workers
+1. **Dashboard Access:** Login with healthcare worker credentials for specialized dashboard
+2. **Training Materials:** Access built-in training modules for water-related health monitoring
+3. **Integration:** Connect with existing health information systems and patient management tools
+
+### For Legal Authorities
+1. **Authority Portal:** Specialized login for compliance monitoring and enforcement tools
+2. **Jurisdiction Setup:** Configure monitoring areas and compliance thresholds
+3. **Reporting Access:** Advanced analytics and legal documentation tools
+
+### For Developers
+1. **API Documentation:** Python summarizer and data APIs available in `Summerizer-model/`
+2. **Sensor Integration:** Arduino code and Firebase setup in `iot-sensors/`
+3. **Local Development:** Full setup instructions in individual module README files
+
+## Architecture
+
+### System Overview
+- **Microservices Architecture:** Scalable, independent service deployment
+- **API Gateway:** Centralized API management and security
+- **Event-Driven:** Real-time data processing with message queues
+- **Multi-tenant:** Supports multiple jurisdictions and organizations
+
+### Security & Compliance
+- **Data Encryption:** End-to-end encryption for sensitive health and legal data
+- **GDPR Compliance:** Privacy-first design with user data control
+- **Role-based Access:** Granular permissions for different user types
+- **Audit Logging:** Comprehensive activity tracking for legal compliance
+
+## Deployment
+
+### Production Environment
+- **Cloud Infrastructure:** Scalable deployment on AWS/GCP with auto-scaling
+- **CI/CD Pipeline:** Automated testing and deployment workflows
+- **Monitoring:** Real-time system health and performance monitoring
+- **Disaster Recovery:** Automated backup and recovery procedures
+
+### Multi-language Support
+- **Supported Languages:** Hindi, English, Tamil, Telugu, Bengali, Marathi
+- **Localization:** Complete UI translation and cultural adaptation
+- **Right-to-Left:** Support for regional script requirements
+- **Voice Integration:** Multi-language voice commands and text-to-speech
 
 ## SIH Relevance
 
-- Directly addresses problem SIH25001
-- Minimal, modular architecture for scalable deployment
-- Real-time actionable health insights for public water sources
+### Problem SIH25001 Alignment
+- **Direct Implementation:** Comprehensive solution for digital water health surveillance as specified
+- **Scalable Architecture:** Designed for deployment across multiple states and districts
+- **Multi-stakeholder Integration:** Seamless coordination between citizens, healthcare workers, and authorities
+- **Real-time Monitoring:** Immediate detection and response to water quality issues
+
+### Innovation Highlights
+- **AI-Powered Intelligence:** Machine learning for predictive analytics and automated summarization
+- **Multi-lingual Accessibility:** Breaking language barriers for widespread adoption across India
+- **Offline Capability:** Essential functionality available without internet connectivity
+- **IoT Integration:** Seamless sensor network integration for continuous monitoring
+
+### Social Impact
+- **Public Health Protection:** Early warning systems for waterborne disease prevention
+- **Regulatory Compliance:** Tools for authorities to ensure water quality standards
+- **Community Empowerment:** Citizen participation in water quality monitoring and reporting
+- **Emergency Response:** Rapid coordination during water contamination incidents
+
+### Technical Excellence
+- **Modern Tech Stack:** Cutting-edge technologies ensuring performance and reliability
+- **Security First:** Enterprise-grade security for sensitive health and legal data
+- **Interoperability:** Standards-based integration with existing government systems
+- **Sustainability:** Efficient resource usage and environmentally conscious design
