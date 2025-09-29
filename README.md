@@ -6,7 +6,7 @@ JalRakshak is an integrated solution for water health surveillance, designed for
 
 ### Core Platform
 - **Multi-platform:** Android app & Web dashboard (Next.js)
-- **Multi-lingual Support:** Available in Hindi, English, Tamil, Telugu, Bengali, and Marathi for wider accessibility
+- **Multi-lingual Support:** Available in Hindi, English, Assamese, Bangla, Bodo, Mizo, Manipuri, and Nepali for wider accessibility
 - **PWA Support:** Works offline and as an installable web app
 - **Cross-device Sync:** Seamless data synchronization across all devices
 
@@ -14,29 +14,21 @@ JalRakshak is an integrated solution for water health surveillance, designed for
 - **Healthcare Worker Dashboard:** Dedicated interface for medical professionals to monitor water-related health impacts, disease tracking, and outbreak management
 - **Legal Authority Dashboard:** Compliance monitoring, regulatory reporting, legal documentation, and enforcement tracking tools
 - **Admin Panel:** Comprehensive system management, user administration, media management, and system analytics
-- **Public Dashboard:** General public access for water quality information and community reporting
+- **Public Dashboard:** General public access for water quality information and community reporting (available in app only)
 
 ### Water Monitoring & Alerts
 - **Real-time Alerts:** ML-powered alerts from IoT sensors and field reports with severity classification
 - **Water Source Watchlist:** Track and receive updates on selected water bodies with custom notification preferences
 - **Interactive Maps:** Visualize water bodies with live health status, contamination levels, and historical data
-- **Predictive Analytics:** AI-driven predictions for water quality trends and potential contamination events
-
-### Reporting & Communication
-- **Field Reporting:** Comprehensive water health report filing with photo/video evidence and GPS tagging
-- **Automated Summarization:** AI-powered report summarization for quick insights and decision making
-- **Authority Notifications:** Automated alerts to relevant authorities based on severity and jurisdiction
-- **Community Engagement:** Public reporting interface and community feedback system
-- **Emergency Response:** Rapid alert system for critical water safety incidents
 
 ## Tech Stack
 
-### Frontend & Web
+### Web Only
 - **Framework:** Next.js 14 with TypeScript, App Router, and Server Components
 - **UI/UX:** Tailwind CSS, Framer Motion animations, responsive design
 - **PWA:** Service workers, offline functionality, push notifications
 - **Maps:** Google Maps integration with custom overlays and clustering
-- **Internationalization:** Next-intl for multi-language support (Hindi, English, Tamil, Telugu, Bengali, Marathi)
+- **Internationalization:** Next-intl for multi-language support (Hindi, English, Assamese, Bangla, Bodo, Mizo, Manipuri, Nepali)
 
 ### Mobile Application
 - **Platform:** Android (Kotlin, Jetpack Compose)
@@ -49,7 +41,7 @@ JalRakshak is an integrated solution for water health surveillance, designed for
 - **Authentication:** Firebase Auth with role-based access control
 - **Database:** MongoDB for scalable data storage and analytics
 - **Real-time:** Firebase Realtime Database for live alerts and notifications
-- **File Storage:** Firebase Storage for images, videos, and documents
+- **File Storage:** S3 bucket for images, videos, and documents
 - **APIs:** RESTful APIs with Express.js and GraphQL for complex queries
 
 ### AI & Machine Learning
@@ -90,18 +82,11 @@ JalRakshak is an integrated solution for water health surveillance, designed for
 - **Historical Data:** Time-lapse visualization of water quality changes
 - **Offline Maps:** Cached mapping data for areas with limited connectivity
 
-### Reporting & Documentation
-- **Field Reports:** Comprehensive water quality reporting with multimedia evidence
-- **AI Summarization:** Automated report processing and key insight extraction
-- **Compliance Tracking:** Legal authority tools for regulatory monitoring and enforcement
-- **Data Export:** Comprehensive reporting tools with multiple export formats
-- **Audit Trails:** Complete activity logging for accountability and transparency
-
 ## Quick Start
 
 ### For General Users
 1. **Web Platform:** Visit [jalrakshak-lemon.vercel.app](https://jalrakshak-lemon.vercel.app)
-2. **Mobile App:** Download from Google Play Store or see `app-android/README.md` for development setup
+2. **Mobile App:** See `app-android/README.md` for development setup
 3. **Registration:** Create account with location verification and notification preferences
 
 ### For Healthcare Workers
@@ -113,39 +98,6 @@ JalRakshak is an integrated solution for water health surveillance, designed for
 1. **Authority Portal:** Specialized login for compliance monitoring and enforcement tools
 2. **Jurisdiction Setup:** Configure monitoring areas and compliance thresholds
 3. **Reporting Access:** Advanced analytics and legal documentation tools
-
-### For Developers
-1. **API Documentation:** Python summarizer and data APIs available in `Summerizer-model/`
-2. **Sensor Integration:** Arduino code and Firebase setup in `iot-sensors/`
-3. **Local Development:** Full setup instructions in individual module README files
-
-## Architecture
-
-### System Overview
-- **Microservices Architecture:** Scalable, independent service deployment
-- **API Gateway:** Centralized API management and security
-- **Event-Driven:** Real-time data processing with message queues
-- **Multi-tenant:** Supports multiple jurisdictions and organizations
-
-### Security & Compliance
-- **Data Encryption:** End-to-end encryption for sensitive health and legal data
-- **GDPR Compliance:** Privacy-first design with user data control
-- **Role-based Access:** Granular permissions for different user types
-- **Audit Logging:** Comprehensive activity tracking for legal compliance
-
-## Deployment
-
-### Production Environment
-- **Cloud Infrastructure:** Scalable deployment on AWS/GCP with auto-scaling
-- **CI/CD Pipeline:** Automated testing and deployment workflows
-- **Monitoring:** Real-time system health and performance monitoring
-- **Disaster Recovery:** Automated backup and recovery procedures
-
-### Multi-language Support
-- **Supported Languages:** Hindi, English, Tamil, Telugu, Bengali, Marathi
-- **Localization:** Complete UI translation and cultural adaptation
-- **Right-to-Left:** Support for regional script requirements
-- **Voice Integration:** Multi-language voice commands and text-to-speech
 
 ## SIH Relevance
 
@@ -166,9 +118,3 @@ JalRakshak is an integrated solution for water health surveillance, designed for
 - **Regulatory Compliance:** Tools for authorities to ensure water quality standards
 - **Community Empowerment:** Citizen participation in water quality monitoring and reporting
 - **Emergency Response:** Rapid coordination during water contamination incidents
-
-### Technical Excellence
-- **Modern Tech Stack:** Cutting-edge technologies ensuring performance and reliability
-- **Security First:** Enterprise-grade security for sensitive health and legal data
-- **Interoperability:** Standards-based integration with existing government systems
-- **Sustainability:** Efficient resource usage and environmentally conscious design
